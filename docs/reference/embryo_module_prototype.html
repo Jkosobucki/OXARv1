@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OX.ar Embryo Module</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Lato:wght@300;400;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#221f20;
+  --aqua:#45a59d;
+  --aqua-deep:#2f7d76;
+  --aqua-soft:#eaf5f3;
+  --aqua-line:#cfe6e2;
+  --blue:#010f99;
+  --paper:#f5f8f7;
+  --card:#ffffff;
+  --line:#e4ecea;
+  --muted:#6c7c7a;
+  --muted-2:#8a9997;
+  --green:#2f9e6f;
+  --green-soft:#e7f5ee;
+  --amber:#c9821c;
+  --amber-soft:#fbf1de;
+  --red:#cf4a4a;
+  --red-soft:#fbe9e9;
+  --slate:#697a78;
+  --slate-soft:#eef2f1;
+  --purple:#7a5cc0;
+  --purple-soft:#efeafb;
+  --radius:12px;
+  --radius-sm:8px;
+  --shadow:0 1px 2px rgba(34,31,32,.04),0 6px 20px rgba(34,31,32,.05);
+  --shadow-lg:0 8px 40px rgba(34,31,32,.10);
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{
+  font-family:'Lato',system-ui,sans-serif;
+  color:var(--ink);
+  background:var(--paper);
+  font-size:14px;
+  line-height:1.45;
+  -webkit-font-smoothing:antialiased;
+}
+.mono{font-family:'JetBrains Mono',monospace;font-feature-settings:"tnum" 1}
+h1,h2,h3,h4{font-family:'Montserrat',sans-serif;margin:0;color:var(--ink);letter-spacing:-.01em}
+button{font-family:inherit;cursor:pointer}
+::selection{background:var(--aqua-soft)}
+
+/* ---------- App shell ---------- */
+.app{display:grid;grid-template-rows:auto auto 1fr;height:100vh;overflow:hidden}
+
+/* Topbar */
+.topbar{
+  display:flex;align-items:center;gap:20px;
+  padding:0 22px;height:60px;
+  background:var(--card);border-bottom:1px solid var(--line);
+  z-index:20;
+}
+.logo{display:flex;align-items:baseline;gap:0;font-family:'Montserrat';font-weight:800;font-size:22px;letter-spacing:-.02em;line-height:1}
+.logo .ox{color:var(--ink)}
+.logo .dot{color:var(--aqua);font-weight:800}
+.logo .ar{color:var(--ink);font-weight:600;font-size:20px;margin-left:1px}
+.logo-sub{font-family:'Montserrat';font-weight:600;font-size:11px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;border-left:1px solid var(--line);padding-left:16px;margin-left:2px}
+
+.ctx{display:flex;align-items:center;gap:14px;margin-left:8px;padding:6px 14px;background:var(--aqua-soft);border:1px solid var(--aqua-line);border-radius:40px;cursor:pointer}
+.ctx:hover{background:#e0f0ed}
+.ctx .avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--aqua),var(--aqua-deep));color:#fff;display:grid;place-items:center;font-family:'Montserrat';font-weight:700;font-size:12px}
+.ctx .who{line-height:1.15}
+.ctx .who b{font-family:'Montserrat';font-weight:700;font-size:13px}
+.ctx .who span{display:block;font-size:11px;color:var(--muted)}
+.ctx .chev{color:var(--muted);font-size:12px}
+
+.spacer{flex:1}
+
+.witness-chip{display:flex;align-items:center;gap:10px;padding:6px 12px;border-radius:40px;background:var(--green-soft);border:1px solid #c4e6d4}
+.witness-chip .lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:700;font-family:'Montserrat'}
+.witness-chip .pair{display:flex;align-items:center;gap:-6px}
+.wdot{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;color:#fff;font-family:'Montserrat';font-weight:700;font-size:10px;border:2px solid #fff}
+.wdot.a{background:var(--aqua-deep)}
+.wdot.b{background:var(--green);margin-left:-8px}
+.witness-chip .ok{color:var(--green);font-weight:700;font-size:12px}
+
+.me{display:flex;align-items:center;gap:9px}
+.me .avatar{width:34px;height:34px;border-radius:50%;background:var(--ink);color:#fff;display:grid;place-items:center;font-family:'Montserrat';font-weight:700;font-size:12px}
+.me .who{line-height:1.15;text-align:right}
+.me .who b{font-family:'Montserrat';font-weight:700;font-size:13px}
+.me .who span{display:block;font-size:11px;color:var(--muted)}
+
+/* Alert strip */
+.alerts{display:flex;align-items:stretch;gap:0;background:var(--card);border-bottom:1px solid var(--line);padding:0 22px;height:42px}
+.alert{display:flex;align-items:center;gap:8px;padding:0 16px;font-size:12.5px;border-right:1px solid var(--line)}
+.alert:first-child{padding-left:0}
+.alert .tag{font-family:'Montserrat';font-weight:700;font-size:10px;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:5px}
+.alert.ok .tag{background:var(--green-soft);color:var(--green)}
+.alert.warn .tag{background:var(--amber-soft);color:var(--amber)}
+.alert.info .tag{background:var(--purple-soft);color:var(--purple)}
+.alert b{font-weight:700}
+.alert .dim{color:var(--muted)}
+
+/* Body layout */
+.body{display:grid;grid-template-columns:230px 1fr;overflow:hidden;min-height:0}
+
+/* Sidebar */
+.side{background:var(--card);border-right:1px solid var(--line);overflow-y:auto;padding:14px 12px}
+.nav-group{margin-bottom:16px}
+.nav-group .gh{font-family:'Montserrat';font-weight:700;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted-2);padding:4px 10px 6px}
+.nav-item{display:flex;align-items:center;gap:11px;padding:8px 10px;border-radius:var(--radius-sm);color:var(--ink);font-size:13.5px;font-weight:400;cursor:pointer;position:relative;margin-bottom:1px}
+.nav-item:hover{background:var(--aqua-soft)}
+.nav-item.active{background:var(--aqua-soft);color:var(--aqua-deep);font-weight:700}
+.nav-item.active::before{content:"";position:absolute;left:-12px;top:6px;bottom:6px;width:3px;background:var(--aqua);border-radius:0 3px 3px 0}
+.nav-item .ic{width:18px;height:18px;flex-shrink:0;stroke:currentColor;fill:none;stroke-width:1.7;opacity:.9}
+.nav-item .count{margin-left:auto;font-family:'JetBrains Mono';font-size:11px;font-weight:600;background:var(--slate-soft);color:var(--muted);padding:1px 7px;border-radius:20px}
+.nav-item.active .count{background:#fff;color:var(--aqua-deep)}
+.nav-item .count.hot{background:var(--amber-soft);color:var(--amber)}
+
+/* Main */
+.main{overflow-y:auto;padding:22px 26px 40px}
+.view{display:none;animation:fade .25s ease}
+.view.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+.page-head{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:18px;gap:20px;flex-wrap:wrap}
+.page-head .eyebrow{font-family:'Montserrat';font-weight:700;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--aqua-deep);margin-bottom:4px}
+.page-head h1{font-size:26px;font-weight:800}
+.page-head .sub{color:var(--muted);font-size:13.5px;margin-top:4px}
+.head-actions{display:flex;gap:8px}
+.btn{display:inline-flex;align-items:center;gap:7px;padding:8px 15px;border-radius:var(--radius-sm);font-family:'Montserrat';font-weight:600;font-size:12.5px;border:1px solid var(--line);background:var(--card);color:var(--ink)}
+.btn:hover{border-color:var(--aqua);color:var(--aqua-deep)}
+.btn.primary{background:var(--aqua-deep);color:#fff;border-color:var(--aqua-deep)}
+.btn.primary:hover{background:var(--aqua);color:#fff}
+.btn .ic{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.9}
+
+/* Cards + grids */
+.grid{display:grid;gap:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+.card-h{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--line)}
+.card-h h3{font-size:14px;font-weight:700}
+.card-h .k{font-size:11.5px;color:var(--muted);font-family:'Montserrat';font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+.card-b{padding:18px}
+
+/* Stat tiles */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:16px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.stat .accent{position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--aqua)}
+.stat .lbl{font-size:11.5px;color:var(--muted);font-family:'Montserrat';font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px}
+.stat .val{font-family:'Montserrat';font-weight:800;font-size:28px;line-height:1}
+.stat .val .unit{font-size:14px;font-weight:600;color:var(--muted-2);margin-left:2px}
+.stat .meta{font-size:11.5px;color:var(--muted);margin-top:6px;display:flex;align-items:center;gap:5px}
+.stat.g .accent{background:var(--green)} .stat.a .accent{background:var(--amber)} .stat.r .accent{background:var(--red)} .stat.p .accent{background:var(--purple)}
+.trend{font-family:'JetBrains Mono';font-weight:600;font-size:11px;padding:1px 6px;border-radius:5px}
+.trend.up{background:var(--green-soft);color:var(--green)} .trend.dn{background:var(--red-soft);color:var(--red)} .trend.flat{background:var(--slate-soft);color:var(--slate)}
+
+/* Badges */
+.badge{display:inline-flex;align-items:center;gap:5px;font-family:'Montserrat';font-weight:600;font-size:11px;padding:3px 9px;border-radius:20px;letter-spacing:.01em;white-space:nowrap}
+.badge .d{width:6px;height:6px;border-radius:50%}
+.b-green{background:var(--green-soft);color:var(--green)} .b-green .d{background:var(--green)}
+.b-amber{background:var(--amber-soft);color:var(--amber)} .b-amber .d{background:var(--amber)}
+.b-red{background:var(--red-soft);color:var(--red)} .b-red .d{background:var(--red)}
+.b-slate{background:var(--slate-soft);color:var(--slate)} .b-slate .d{background:var(--slate)}
+.b-aqua{background:var(--aqua-soft);color:var(--aqua-deep)} .b-aqua .d{background:var(--aqua-deep)}
+.b-purple{background:var(--purple-soft);color:var(--purple)} .b-purple .d{background:var(--purple)}
+
+/* Tables */
+table{width:100%;border-collapse:collapse}
+thead th{font-family:'Montserrat';font-weight:600;font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);text-align:left;padding:10px 14px;border-bottom:1px solid var(--line);white-space:nowrap}
+tbody td{padding:11px 14px;border-bottom:1px solid var(--line);font-size:13px;vertical-align:middle}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover{background:#fafcfb}
+td .id{font-family:'JetBrains Mono';font-weight:500;font-size:12px;color:var(--aqua-deep)}
+.who-cell{display:flex;align-items:center;gap:9px}
+.who-cell .av{width:28px;height:28px;border-radius:50%;background:var(--slate-soft);color:var(--muted);display:grid;place-items:center;font-family:'Montserrat';font-weight:700;font-size:10px;flex-shrink:0}
+.who-cell b{font-weight:700;font-size:13px}
+.who-cell small{display:block;color:var(--muted);font-size:11px;font-family:'JetBrains Mono'}
+.witness-mini{display:inline-flex;align-items:center}
+.witness-mini .m{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;color:#fff;font-family:'Montserrat';font-weight:700;font-size:9px;border:2px solid #fff}
+.witness-mini .m:nth-child(2){margin-left:-7px}
+
+/* Worklist filter chips */
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.chip{padding:6px 13px;border-radius:20px;border:1px solid var(--line);background:var(--card);font-size:12.5px;font-weight:600;color:var(--muted);font-family:'Montserrat'}
+.chip:hover{border-color:var(--aqua)}
+.chip.on{background:var(--aqua-deep);border-color:var(--aqua-deep);color:#fff}
+.chip .n{font-family:'JetBrains Mono';font-size:11px;opacity:.85;margin-left:4px}
+
+/* Timeline (cycle events) */
+.timeline{position:relative;padding-left:8px}
+.tl-item{display:grid;grid-template-columns:130px 26px 1fr;gap:14px;align-items:start;padding:4px 0}
+.tl-time{text-align:right;padding-top:9px}
+.tl-time b{font-family:'JetBrains Mono';font-weight:600;font-size:12.5px;display:block}
+.tl-time span{font-size:11px;color:var(--muted)}
+.tl-rail{display:flex;flex-direction:column;align-items:center}
+.tl-node{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;margin-top:6px;z-index:2;border:2px solid #fff}
+.tl-node svg{width:13px;height:13px;stroke:#fff;fill:none;stroke-width:2}
+.tl-node.done{background:var(--green)} .tl-node.now{background:var(--aqua);box-shadow:0 0 0 4px var(--aqua-soft)} .tl-node.next{background:#fff;border:2px solid var(--line)} .tl-node.next svg{stroke:var(--muted-2)}
+.tl-line{width:2px;flex:1;background:var(--line);min-height:22px}
+.tl-item:last-child .tl-line{display:none}
+.tl-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius-sm);padding:11px 14px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:14px}
+.tl-card.active{border-color:var(--aqua);background:var(--aqua-soft)}
+.tl-card .t b{font-family:'Montserrat';font-weight:700;font-size:13.5px}
+.tl-card .t span{display:block;font-size:11.5px;color:var(--muted);margin-top:1px}
+
+/* Donut + legend */
+.donut-wrap{display:flex;align-items:center;gap:22px}
+.legend{display:flex;flex-direction:column;gap:9px}
+.legend .row{display:flex;align-items:center;gap:9px;font-size:13px}
+.legend .sw{width:11px;height:11px;border-radius:3px}
+.legend .row b{font-family:'JetBrains Mono';font-weight:600;margin-left:auto;padding-left:16px}
+.legend .row .pct{color:var(--muted);font-size:11px;font-family:'JetBrains Mono'}
+
+/* KPI bars */
+.kpi-row{display:flex;align-items:center;gap:14px;padding:12px 0;border-bottom:1px solid var(--line)}
+.kpi-row:last-child{border-bottom:none}
+.kpi-row .name{width:190px;flex-shrink:0}
+.kpi-row .name b{font-weight:700;font-size:13px;display:block}
+.kpi-row .name span{font-size:11px;color:var(--muted)}
+.kpi-track{flex:1;height:22px;background:var(--slate-soft);border-radius:6px;position:relative;overflow:hidden}
+.kpi-fill{position:absolute;left:0;top:0;bottom:0;border-radius:6px;display:flex;align-items:center;justify-content:flex-end;padding-right:8px;color:#fff;font-family:'JetBrains Mono';font-weight:600;font-size:11px}
+.kpi-bench{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--ink);z-index:3}
+.kpi-bench::after{content:attr(data-l);position:absolute;top:-15px;left:50%;transform:translateX(-50%);font-size:9px;font-family:'JetBrains Mono';color:var(--muted);white-space:nowrap}
+.kpi-val{width:64px;text-align:right;font-family:'JetBrains Mono';font-weight:600;font-size:13px}
+
+/* Embryo lifecycle grid (signature) */
+.embryo-lanes{display:flex;flex-direction:column;gap:2px}
+.lane-head{display:grid;grid-template-columns:180px repeat(8,1fr) 120px;gap:0;align-items:center;padding:0 0 8px}
+.lane-head .col{font-family:'Montserrat';font-weight:600;font-size:10.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);text-align:center}
+.lane-head .col.embryo-col,.lane-head .col.fate-col{text-align:left;padding-left:6px}
+.lane{display:grid;grid-template-columns:180px repeat(8,1fr) 120px;gap:0;align-items:stretch;border-top:1px solid var(--line)}
+.lane:hover{background:#fafcfb}
+.lane .embryo-cell{display:flex;align-items:center;gap:10px;padding:10px 6px}
+.lane .embryo-cell .seq{width:34px;height:34px;border-radius:9px;background:var(--aqua-soft);color:var(--aqua-deep);display:grid;place-items:center;font-family:'JetBrains Mono';font-weight:600;font-size:13px;flex-shrink:0;border:1px solid var(--aqua-line)}
+.lane .embryo-cell b{font-family:'JetBrains Mono';font-weight:600;font-size:12.5px;display:block}
+.lane .embryo-cell small{color:var(--muted);font-size:11px}
+.daycell{border-left:1px solid var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:8px 2px;position:relative}
+.daycell .stage{font-family:'JetBrains Mono';font-weight:600;font-size:11px}
+.daycell .grade{font-family:'Montserrat';font-weight:700;font-size:13px}
+.daycell .frag{font-size:9.5px;color:var(--muted);font-family:'JetBrains Mono'}
+.daycell.empty{background:repeating-linear-gradient(135deg,#fbfcfc,#fbfcfc 6px,#f4f7f6 6px,#f4f7f6 7px)}
+.daycell.g-a{background:var(--green-soft)} .daycell.g-a .grade{color:var(--green)}
+.daycell.g-b{background:var(--aqua-soft)} .daycell.g-b .grade{color:var(--aqua-deep)}
+.daycell.g-c{background:var(--amber-soft)} .daycell.g-c .grade{color:var(--amber)}
+.daycell.stop{background:var(--red-soft)} .daycell.stop .grade{color:var(--red)}
+.daycell.now-day::after{content:"";position:absolute;top:0;left:0;right:0;height:2px;background:var(--aqua)}
+.lane .fate-cell{border-left:1px solid var(--line);display:flex;align-items:center;padding:8px 6px}
+.day-marker{position:relative}
+.now-flag{display:inline-block;font-family:'Montserrat';font-weight:700;font-size:9px;color:var(--aqua-deep);background:var(--aqua-soft);padding:1px 5px;border-radius:4px;margin-left:5px;vertical-align:middle}
+
+/* Cryo tank */
+.tank-layout{display:grid;grid-template-columns:1fr 1.4fr;gap:16px}
+.tank-visual{background:linear-gradient(180deg,#f8fbfa,#eef5f4);border:1px solid var(--line);border-radius:var(--radius);padding:20px;display:flex;flex-direction:column;align-items:center}
+.tank-svg{width:100%;max-width:230px}
+.canister-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:16px;width:100%}
+.canister{aspect-ratio:1;border-radius:9px;border:1px solid var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;transition:transform .1s;background:var(--card)}
+.canister:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+.canister .cn{font-family:'JetBrains Mono';font-weight:600;font-size:11px}
+.canister .fill-txt{font-size:9.5px;color:var(--muted);font-family:'JetBrains Mono'}
+.canister .bar{width:70%;height:4px;border-radius:3px;background:var(--slate-soft);overflow:hidden;margin-top:2px}
+.canister .bar i{display:block;height:100%}
+.canister.high{border-color:#e6b8b8} .canister.high .bar i{background:var(--red)}
+.canister.med{border-color:#e8cf9c} .canister.med .bar i{background:var(--amber)}
+.canister.low{border-color:#bfe2d6} .canister.low .bar i{background:var(--green)}
+.goblet-legend{display:flex;gap:16px;margin-top:16px;font-size:11px;color:var(--muted)}
+.goblet-legend span{display:flex;align-items:center;gap:6px}
+.goblet-legend i{width:10px;height:10px;border-radius:3px;display:block}
+
+/* Verification / 3-point check cards */
+.check-list{display:flex;flex-direction:column;gap:10px}
+.check-item{display:flex;align-items:center;gap:14px;padding:13px 16px;border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--card)}
+.check-item .num{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;font-family:'JetBrains Mono';font-weight:600;font-size:13px;flex-shrink:0}
+.check-item.done{border-color:#c4e6d4;background:var(--green-soft)}
+.check-item.done .num{background:var(--green);color:#fff}
+.check-item.pending{border-color:#e8cf9c;background:var(--amber-soft)}
+.check-item.pending .num{background:var(--amber);color:#fff}
+.check-item .body b{font-family:'Montserrat';font-weight:700;font-size:13.5px}
+.check-item .body span{display:block;font-size:12px;color:var(--muted)}
+.check-item .who{margin-left:auto;text-align:right;font-size:11.5px}
+.check-item .who b{font-family:'JetBrains Mono';font-weight:600;font-size:12px}
+.check-item .who span{color:var(--muted)}
+
+/* Two-col detail */
+.two{display:grid;grid-template-columns:1.5fr 1fr;gap:16px;align-items:start}
+.field-list{display:grid;grid-template-columns:1fr 1fr;gap:0}
+.field{padding:11px 0;border-bottom:1px solid var(--line)}
+.field .fl{font-size:11px;color:var(--muted);font-family:'Montserrat';font-weight:600;text-transform:uppercase;letter-spacing:.03em;margin-bottom:3px}
+.field .fv{font-size:13.5px;font-weight:400}
+.field .fv.mono{font-family:'JetBrains Mono';font-weight:500}
+
+/* PN board */
+.pn-board{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:10px}
+.pn-cell{border:1px solid var(--line);border-radius:var(--radius-sm);padding:12px 10px;text-align:center;position:relative}
+.pn-cell .seq{font-family:'JetBrains Mono';font-size:10.5px;color:var(--muted);margin-bottom:6px}
+.pn-cell .pn{font-family:'Montserrat';font-weight:800;font-size:19px}
+.pn-cell .st{font-size:10px;margin-top:4px;font-weight:600}
+.pn-cell.norm{background:var(--green-soft);border-color:#c4e6d4} .pn-cell.norm .pn{color:var(--green)}
+.pn-cell.abn{background:var(--amber-soft);border-color:#e8cf9c} .pn-cell.abn .pn{color:var(--amber)}
+.pn-cell.fail{background:var(--slate-soft)} .pn-cell.fail .pn{color:var(--slate)}
+
+.note{font-size:12px;color:var(--muted);background:var(--slate-soft);border-radius:var(--radius-sm);padding:10px 13px;line-height:1.5}
+.note b{color:var(--ink)}
+
+.hint{font-size:11.5px;color:var(--muted-2);display:flex;align-items:center;gap:6px;margin-top:14px}
+.hint svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.8}
+
+.empty-state{text-align:center;padding:60px 20px;color:var(--muted)}
+.empty-state svg{width:44px;height:44px;stroke:var(--aqua);fill:none;stroke-width:1.4;margin-bottom:14px;opacity:.7}
+.empty-state h3{font-size:16px;margin-bottom:6px}
+
+.footer-note{margin-top:30px;padding-top:16px;border-top:1px solid var(--line);font-size:11px;color:var(--muted-2);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+
+@media(max-width:1100px){
+  .two,.tank-layout{grid-template-columns:1fr}
+  .body{grid-template-columns:64px 1fr}
+  .nav-item span.txt,.nav-group .gh,.logo-sub{display:none}
+  .nav-item{justify-content:center}
+  .nav-item .count{display:none}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="logo"><span class="ox">OX</span><span class="dot">.</span><span class="ar">ar</span></div>
+    <div class="logo-sub">Embryo Module</div>
+    <div class="ctx" title="Switch active cycle">
+      <div class="avatar">JS</div>
+      <div class="who"><b>SAMPLE, Jane</b><span class="mono">OXAR-100248 · TC-2026-0417</span></div>
+      <div class="chev">▾</div>
+    </div>
+    <div class="spacer"></div>
+    <div class="witness-chip" title="Double-witnessing active for this session">
+      <span class="lbl">Witnessing</span>
+      <span class="pair">
+        <span class="wdot a">AO</span>
+        <span class="wdot b">LC</span>
+      </span>
+      <span class="ok">✓ 2 present</span>
+    </div>
+    <div class="me">
+      <div class="who"><b>A. Okafor</b><span>Senior Embryologist</span></div>
+      <div class="avatar">AO</div>
+    </div>
+  </header>
+
+  <!-- ALERT STRIP -->
+  <div class="alerts">
+    <div class="alert ok"><span class="tag">Allergy</span> <b>NKDA</b> <span class="dim">No known drug allergies</span></div>
+    <div class="alert warn"><span class="tag">Consent</span> <b>1 outstanding</b> <span class="dim">Cryostorage renewal due</span></div>
+    <div class="alert info"><span class="tag">Research</span> <b>Enrolled</b> <span class="dim">Time-lapse morphokinetics (RP-08)</span></div>
+    <div class="alert"><span class="tag" style="background:var(--aqua-soft);color:var(--aqua-deep)">Cycle</span> <b>ICSI</b> <span class="dim">Day 5 · Fresh transfer planned</span></div>
+  </div>
+
+  <!-- BODY -->
+  <div class="body">
+
+    <!-- SIDEBAR -->
+    <nav class="side">
+      <div class="nav-group">
+        <div class="gh">Planning</div>
+        <div class="nav-item active" data-view="worklist">
+          <svg class="ic" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M8 2v4M16 2v4M3 10h18"/></svg>
+          <span class="txt">Worklist &amp; Diary</span><span class="count hot">12</span>
+        </div>
+        <div class="nav-item" data-view="cycle">
+          <svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+          <span class="txt">Cycle Overview</span>
+        </div>
+        <div class="nav-item" data-view="checks">
+          <svg class="ic" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          <span class="txt">Consent &amp; 3-Point Check</span><span class="count">2</span>
+        </div>
+      </div>
+
+      <div class="nav-group">
+        <div class="gh">Procedures</div>
+        <div class="nav-item" data-view="opu">
+          <svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="2.5"/></svg>
+          <span class="txt">Egg Collection (OPU)</span>
+        </div>
+        <div class="nav-item" data-view="semen">
+          <svg class="ic" viewBox="0 0 24 24"><circle cx="7" cy="8" r="3"/><path d="M9.5 9.5C14 12 17 15 21 20"/></svg>
+          <span class="txt">Semen Preparation</span>
+        </div>
+        <div class="nav-item" data-view="fert">
+          <svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/></svg>
+          <span class="txt">Insemination &amp; Fert.</span>
+        </div>
+      </div>
+
+      <div class="nav-group">
+        <div class="gh">Lab Culture</div>
+        <div class="nav-item" data-view="develop">
+          <svg class="ic" viewBox="0 0 24 24"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg>
+          <span class="txt">Embryo Development</span><span class="count">6</span>
+        </div>
+        <div class="nav-item" data-view="transfer">
+          <svg class="ic" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          <span class="txt">Embryo Transfer</span>
+        </div>
+      </div>
+
+      <div class="nav-group">
+        <div class="gh">Cryo Storage</div>
+        <div class="nav-item" data-view="tank">
+          <svg class="ic" viewBox="0 0 24 24"><path d="M8 3h8v4l-1 2v10a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2V9L8 7z"/><path d="M9 13h6"/></svg>
+          <span class="txt">Cryo Tank View</span>
+        </div>
+        <div class="nav-item" data-view="inventory">
+          <svg class="ic" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 9v12"/></svg>
+          <span class="txt">Storage Inventory</span><span class="count">38</span>
+        </div>
+      </div>
+
+      <div class="nav-group">
+        <div class="gh">Governance</div>
+        <div class="nav-item" data-view="witnessing">
+          <svg class="ic" viewBox="0 0 24 24"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z"/><path d="M9 12l2 2 4-4"/></svg>
+          <span class="txt">Witnessing Log</span>
+        </div>
+      </div>
+    </nav>
+
+    <!-- MAIN -->
+    <main class="main">
+
+      <!-- ============ WORKLIST ============ -->
+      <section class="view active" data-view="worklist">
+        <div class="page-head">
+          <div>
+            <div class="eyebrow">Planning · Site: Riverside ART Lab</div>
+            <h1>Today's Worklist</h1>
+            <div class="sub">Tuesday, 14 July 2026 · 12 scheduled events · 4 awaiting witness sign-off</div>
+          </div>
+          <div class="head-actions">
+            <button class="btn"><svg class="ic" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M8 2v4M16 2v4M3 10h18"/></svg>Week view</button>
+            <button class="btn primary"><svg class="ic" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>New event</button>
+          </div>
+        </div>
+
+        <div class="stats">
+          <div class="stat"><div class="accent"></div><div class="lbl">Scheduled today</div><div class="val">12</div><div class="meta">across 5 active cycles</div></div>
+          <div class="stat g"><div class="accent"></div><div class="lbl">Completed</div><div class="val">6</div><div class="meta"><span class="trend up">50%</span> of day</div></div>
+          <div class="stat a"><div class="accent"></div><div class="lbl">Awaiting witness</div><div class="val">4</div><div class="meta">sign-off required</div></div>
+          <div class="stat r"><div class="accent"></div><div class="lbl">Time-critical</div><div class="val">2</div><div class="meta">thaw window &lt; 2h</div></div>
+        </div>
+
+        <div class="filters">
+          <button class="chip on">All events<span class="n">12</span></button>
+          <button class="chip">OPU<span class="n">2</span></button>
+          <button class="chip">Insemination<span class="n">3</span></button>
+          <button class="chip">Assessment<span class="n">4</span></button>
+          <button class="chip">Transfer<span class="n">1</span></button>
+          <button class="chip">Thaw<span class="n">2</span></button>
+        </div>
+
+        <div class="card">
+          <div class="card-h"><h3>Event queue</h3><span class="k">Sorted by scheduled time</span></div>
+          <table>
+            <thead><tr><th>Time</th><th>Event</th><th>Patient / Cycle</th><th>Assigned</th><th>Witness</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr>
+                <td class="mono" style="font-weight:600">07:30</td>
+                <td><b style="font-family:Montserrat">Egg Collection (OPU)</b><br><span class="mono" style="font-size:11px;color:var(--muted)">14 follicles aspirated</span></td>
+                <td><div class="who-cell"><div class="av">RM</div><div><b>MODEL, Rae</b><small>TC-2026-0402</small></div></div></td>
+                <td>A. Okafor</td>
+                <td><span class="witness-mini"><span class="m" style="background:var(--aqua-deep)">AO</span><span class="m" style="background:var(--green)">LC</span></span></td>
+                <td><span class="badge b-green"><span class="d"></span>Completed</span></td>
+              </tr>
+              <tr>
+                <td class="mono" style="font-weight:600">09:00</td>
+                <td><b style="font-family:Montserrat">ICSI Insemination</b><br><span class="mono" style="font-size:11px;color:var(--muted)">8 MII oocytes</span></td>
+                <td><div class="who-cell"><div class="av">JS</div><div><b>SAMPLE, Jane</b><small>TC-2026-0417</small></div></div></td>
+                <td>A. Okafor</td>
+                <td><span class="witness-mini"><span class="m" style="background:var(--aqua-deep)">AO</span><span class="m" style="background:var(--green)">LC</span></span></td>
+                <td><span class="badge b-green"><span class="d"></span>Completed</span></td>
+              </tr>
+              <tr>
+                <td class="mono" style="font-weight:600">10:15</td>
+                <td><b style="font-family:Montserrat">Frozen Sperm Thaw</b><br><span class="mono" style="font-size:11px;color:var(--red)">Window closes 11:45</span></td>
+                <td><div class="who-cell"><div class="av">DT</div><div><b>DEMO, Toni</b><small>TC-2026-0409</small></div></div></td>
+                <td>M. Ferreira</td>
+                <td><span class="badge b-amber"><span class="d"></span>Needs 2nd</span></td>
+                <td><span class="badge b-amber"><span class="d"></span>In progress</span></td>
+              </tr>
+              <tr>
+                <td class="mono" style="font-weight:600">11:00</td>
+                <td><b style="font-family:Montserrat">Day 5 Assessment</b><br><span class="mono" style="font-size:11px;color:var(--muted)">6 embryos in culture</span></td>
+                <td><div class="who-cell"><div class="av">JS</div><div><b>SAMPLE, Jane</b><small>TC-2026-0417</small></div></div></td>
+                <td>A. Okafor</td>
+                <td><span class="badge b-slate"><span class="d"></span>Not started</span></td>
+                <td><span class="badge b-aqua"><span class="d"></span>Ready</span></td>
+              </tr>
+              <tr>
+                <td class="mono" style="font-weight:600">13:30</td>
+                <td><b style="font-family:Montserrat">Embryo Transfer</b><br><span class="mono" style="font-size:11px;color:var(--muted)">Fresh · single blastocyst</span></td>
+                <td><div class="who-cell"><div class="av">JS</div><div><b>SAMPLE, Jane</b><small>TC-2026-0417</small></div></div></td>
+                <td>A. Okafor + Dr. Mensah</td>
+                <td><span class="badge b-slate"><span class="d"></span>Not started</span></td>
+                <td><span class="badge b-slate"><span class="d"></span>Scheduled</span></td>
+              </tr>
+              <tr>
+                <td class="mono" style="font-weight:600">14:45</td>
+                <td><b style="font-family:Montserrat">Blastocyst Vitrification</b><br><span class="mono" style="font-size:11px;color:var(--muted)">2 embryos for freeze</span></td>
+                <td><div class="who-cell"><div class="av">DP</div><div><b>PROTO, Dana</b><small>TC-2026-0398</small></div></div></td>
+                <td>M. Ferreira</td>
+                <td><span class="badge b-slate"><span class="d"></span>Not started</span></td>
+                <td><span class="badge b-slate"><span class="d"></span>Scheduled</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="hint"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg> Every procedure requires a two-person witness sign-off before it can be marked complete. Prototype data uses synthetic patient records.</div>
+      </section>
+
+      <!-- ============ CYCLE OVERVIEW ============ -->
+      <section class="view" data-view="cycle">
+        <div class="page-head">
+          <div>
+            <div class="eyebrow">SAMPLE, Jane · OXAR-100248</div>
+            <h1>Cycle TC-2026-0417</h1>
+            <div class="sub">ICSI · Own oocytes + partner sperm · OPU 09 Jul · Day 5 of culture</div>
+          </div>
+          <div class="head-actions">
+            <button class="btn"><svg class="ic" viewBox="0 0 24 24"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5h20v5a2 2 0 0 1-2 2h-2M6 14h12v8H6z"/></svg>Print worksheet</button>
+            <button class="btn primary"><svg class="ic" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>Next event</button>
+          </div>
+        </div>
+
+        <div class="stats">
+          <div class="stat"><div class="accent"></div><div class="lbl">Eggs retrieved</div><div class="val">11</div><div class="meta">8 MII mature</div></div>
+          <div class="stat g"><div class="accent"></div><div class="lbl">Fertilised (2PN)</div><div class="val">6 <span class="unit">/8</span></div><div class="meta"><span class="trend up">75%</span> above benchmark</div></div>
+          <div class="stat"><div class="accent"></div><div class="lbl">In culture · Day 5</div><div class="val">6</div><div class="meta">4 blastulated</div></div>
+          <div class="stat p"><div class="accent"></div><div class="lbl">Usable blasts</div><div class="val">4 <span class="unit">/6</span></div><div class="meta"><span class="trend up">67%</span> total usable</div></div>
+        </div>
+
+        <div class="two">
+          <div class="card">
+            <div class="card-h"><h3>Cycle event timeline</h3><span class="k">Template: Standard ICSI</span></div>
+            <div class="card-b">
+              <div class="timeline">
+                <div class="tl-item">
+                  <div class="tl-time"><b>Wed 09 Jul</b><span>07:30</span></div>
+                  <div class="tl-rail"><div class="tl-node done"><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 6"/></svg></div><div class="tl-line"></div></div>
+                  <div><div class="tl-card"><div class="t"><b>Egg Collection (OPU)</b><span>11 oocytes · 8 MII · 2 MI · 1 GV</span></div><span class="badge b-green"><span class="d"></span>Done</span></div></div>
+                </div>
+                <div class="tl-item">
+                  <div class="tl-time"><b>Wed 09 Jul</b><span>09:15</span></div>
+                  <div class="tl-rail"><div class="tl-node done"><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 6"/></svg></div><div class="tl-line"></div></div>
+                  <div><div class="tl-card"><div class="t"><b>ICSI Insemination</b><span>8 MII injected · partner sperm, fresh</span></div><span class="badge b-green"><span class="d"></span>Done</span></div></div>
+                </div>
+                <div class="tl-item">
+                  <div class="tl-time"><b>Thu 10 Jul</b><span>08:00</span></div>
+                  <div class="tl-rail"><div class="tl-node done"><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 6"/></svg></div><div class="tl-line"></div></div>
+                  <div><div class="tl-card"><div class="t"><b>Fertilisation Check</b><span>6 × 2PN · 1 × 1PN · 1 × 0PN</span></div><span class="badge b-green"><span class="d"></span>Done</span></div></div>
+                </div>
+                <div class="tl-item">
+                  <div class="tl-time"><b>Sat 12 Jul</b><span>08:30</span></div>
+                  <div class="tl-rail"><div class="tl-node done"><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 6"/></svg></div><div class="tl-line"></div></div>
+                  <div><div class="tl-card"><div class="t"><b>Day 3 Assessment</b><span>6 cleavage embryos · 5 continued to culture</span></div><span class="badge b-green"><span class="d"></span>Done</span></div></div>
+                </div>
+                <div class="tl-item">
+                  <div class="tl-time"><b>Tue 14 Jul</b><span>11:00</span></div>
+                  <div class="tl-rail"><div class="tl-node now"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4" fill="#fff" stroke="none"/></svg></div><div class="tl-line"></div></div>
+                  <div><div class="tl-card active"><div class="t"><b>Day 5 Assessment</b><span>Grading &amp; selection · in progress now</span></div><span class="badge b-aqua"><span class="d"></span>Active</span></div></div>
+                </div>
+                <div class="tl-item">
+                  <div class="tl-time"><b>Tue 14 Jul</b><span>13:30</span></div>
+                  <div class="tl-rail"><div class="tl-node next"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div></div>
+                  <div><div class="tl-card"><div class="t"><b>Fresh Embryo Transfer</b><span>Single blastocyst · Dr. Mensah</span></div><span class="badge b-slate"><span class="d"></span>Planned</span></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid" style="align-content:start">
+            <div class="card">
+              <div class="card-h"><h3>Prerequisites</h3></div>
+              <div class="card-b" style="padding:14px">
+                <div class="check-list">
+                  <div class="check-item done" style="padding:11px 13px"><div class="num">✓</div><div class="body"><b>Consent to treatment</b><span>Signed 02 Jul 2026</span></div></div>
+                  <div class="check-item done" style="padding:11px 13px"><div class="num">✓</div><div class="body"><b>Infectious screening</b><span>Both partners · valid</span></div></div>
+                  <div class="check-item pending" style="padding:11px 13px"><div class="num">!</div><div class="body"><b>Cryostorage renewal</b><span>Due before any freeze</span></div></div>
+                  <div class="check-item done" style="padding:11px 13px"><div class="num">✓</div><div class="body"><b>Doctor approval</b><span>Dr. Mensah · 08 Jul</span></div></div>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-h"><h3>Care team</h3></div>
+              <div class="card-b">
+                <div class="field-list" style="grid-template-columns:1fr">
+                  <div class="field"><div class="fl">Fertility doctor</div><div class="fv">Dr. R. Mensah</div></div>
+                  <div class="field"><div class="fl">Lead embryologist</div><div class="fv">A. Okafor</div></div>
+                  <div class="field" style="border-bottom:none"><div class="fl">Nominated witness</div><div class="fv">L. Chen</div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ CONSENT & 3-POINT CHECK ============ -->
+      <section class="view" data-view="checks">
+        <div class="page-head">
+          <div>
+            <div class="eyebrow">Governance · Pre-procedure verification</div>
+            <h1>3-Point Check &amp; Consent</h1>
+            <div class="sub">Verify three unique identifiers and confirm consent before every critical step</div>
+          </div>
+          <div class="head-actions"><button class="btn primary"><svg class="ic" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Record new check</button></div>
+        </div>
+
+        <div class="note" style="margin-bottom:18px">A <b>three-point check</b> confirms three independent patient identifiers before any critical embryology procedure (egg collection, insemination, transfer, freeze, thaw, discard). It is performed by the operating embryologist and confirmed by an independent witness.</div>
+
+        <div class="two">
+          <div class="card">
+            <div class="card-h"><h3>Verification for next step: Embryo Transfer 13:30</h3><span class="badge b-amber"><span class="d"></span>Awaiting witness</span></div>
+            <div class="card-b">
+              <div class="check-list">
+                <div class="check-item done"><div class="num">1</div><div class="body"><b>Patient identity verified</b><span>Full name + date of birth + MRN OXAR-100248</span></div><div class="who"><b>A. Okafor</b><span>11:02</span></div></div>
+                <div class="check-item done"><div class="num">2</div><div class="body"><b>Partner identity verified</b><span>Full name + MRN OXAR-100249</span></div><div class="who"><b>A. Okafor</b><span>11:02</span></div></div>
+                <div class="check-item done"><div class="num">3</div><div class="body"><b>Dish &amp; specimen labels matched</b><span>Embryo E-04 · dish barcode reconciled</span></div><div class="who"><b>A. Okafor</b><span>11:03</span></div></div>
+                <div class="check-item pending"><div class="num">W</div><div class="body"><b>Independent witness confirmation</b><span>Second person must confirm all three points</span></div><div class="who"><b>Pending</b><span>L. Chen</span></div></div>
+              </div>
+              <div class="hint"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg> The procedure cannot be started until the witness confirms. This mirrors electronic double-witnessing required across accredited ART labs.</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-h"><h3>Steps requiring a check</h3><span class="k">This cycle</span></div>
+            <div class="card-b" style="padding:8px 14px">
+              <table>
+                <tbody style="font-size:12.5px">
+                  <tr><td>Egg Collection</td><td style="text-align:right"><span class="badge b-green"><span class="d"></span>Verified</span></td></tr>
+                  <tr><td>Semen Collection</td><td style="text-align:right"><span class="badge b-green"><span class="d"></span>Verified</span></td></tr>
+                  <tr><td>Insemination (ICSI)</td><td style="text-align:right"><span class="badge b-green"><span class="d"></span>Verified</span></td></tr>
+                  <tr><td>Fertilisation Check</td><td style="text-align:right"><span class="badge b-green"><span class="d"></span>Verified</span></td></tr>
+                  <tr><td>Embryo Transfer</td><td style="text-align:right"><span class="badge b-amber"><span class="d"></span>In progress</span></td></tr>
+                  <tr><td>Embryo Freeze</td><td style="text-align:right"><span class="badge b-slate"><span class="d"></span>Pending</span></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ OPU ============ -->
+      <section class="view" data-view="opu">
+        <div class="page-head">
+          <div>
+            <div class="eyebrow">Procedure · OPU-2026-0417</div>
+            <h1>Egg Collection (OPU)</h1>
+            <div class="sub">Oocyte retrieval · 09 Jul 2026 · Dr. Mensah · Recorded by A. Okafor</div>
+          </div>
+          <div class="head-actions"><button class="btn"><svg class="ic" viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>Edit record</button></div>
+        </div>
+
+        <div class="stats">
+          <div class="stat"><div class="accent"></div><div class="lbl">Follicles aspirated</div><div class="val">14</div></div>
+          <div class="stat g"><div class="accent"></div><div class="lbl">Eggs retrieved</div><div class="val">11</div><div class="meta">79% recovery</div></div>
+          <div class="stat"><div class="accent"></div><div class="lbl">Mature (MII)</div><div class="val">8</div><div class="meta">ready for ICSI</div></div>
+          <div class="stat a"><div class="accent"></div><div class="lbl">Immature</div><div class="val">3</div><div class="meta">2 MI · 1 GV</div></div>
+        </div>
+
+        <div class="two">
+          <div class="card">
+            <div class="card-h"><h3>Oocyte maturity breakdown</h3><span class="k">Post-denuding assessment</span></div>
+            <div class="card-b">
+              <div class="donut-wrap">
+                <svg viewBox="0 0 42 42" width="150" height="150" style="flex-shrink:0">
+                  <circle cx="21" cy="21" r="15.9" fill="none" stroke="#eef2f1" stroke-width="7"/>
+                  <circle cx="21" cy="21" r="15.9" fill="none" stroke="#2f9e6f" stroke-width="7" stroke-dasharray="72.7 27.3" stroke-dashoffset="25" stroke-linecap="round"/>
+                  <circle cx="21" cy="21" r="15.9" fill="none" stroke="#c9821c" stroke-width="7" stroke-dasharray="18.2 81.8" stroke-dashoffset="-47.7" stroke-linecap="round"/>
+                  <circle cx="21" cy="21" r="15.9" fill="none" stroke="#697a78" stroke-width="7" stroke-dasharray="9.1 90.9" stroke-dashoffset="-65.9" stroke-linecap="round"/>
+                  <text x="21" y="20" text-anchor="middle" font-family="Montserrat" font-weight="800" font-size="9" fill="#221f20">11</text>
+                  <text x="21" y="26" text-anchor="middle" font-family="Lato" font-size="3.4" fill="#6c7c7a">oocytes</text>
+                </svg>
+                <div class="legend" style="flex:1">
+                  <div class="row"><span class="sw" style="background:#2f9e6f"></span>MII · Metaphase II (mature)<b>8</b><span class="pct">73%</span></div>
+                  <div class="row"><span class="sw" style="background:#c9821c"></span>MI · Metaphase I<b>2</b><span class="pct">18%</span></div>
+                  <div class="row"><span class="sw" style="background:#697a78"></span>GV · Germinal vesicle<b>1</b><span class="pct">9%</span></div>
+                  <div class="note" style="margin-top:8px">Only <b>MII</b> oocytes carry a visible polar body and are mature enough for ICSI. MI and GV oocytes are immature and were not injected.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-h"><h3>Procedure record</h3></div>
+            <div class="card-b" style="padding:6px 18px 14px">
+              <div class="field-list">
+                <div class="field"><div class="fl">OPU ID</div><div class="fv mono">OPU-2026-0417</div></div>
+                <div class="field"><div class="fl">Procedure date</div><div class="fv mono">09 Jul 2026 · 07:30</div></div>
+                <div class="field"><div class="fl">Doctor</div><div class="fv">Dr. R. Mensah</div></div>
+                <div class="field"><div class="fl">Embryologist</div><div class="fv">A. Okafor</div></div>
+                <div class="field"><div class="fl">Witness</div><div class="fv">L. Chen</div></div>
+                <div class="field"><div class="fl">Complications</div><div class="fv">None recorded</div></div>
+              </div>
+              <div class="note" style="margin-top:14px"><b>Notes:</b> Clear follicular fluid throughout. Patient tolerated procedure well. Oocytes transferred to culture within 8 minutes of collection.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ SEMEN PREP ============ -->
+      <section class="view" data-view="semen">
+        <div class="page-head">
+          <div>
+            <div class="eyebrow">Procedure · SP-2026-0417</div>
+            <h1>Semen Preparation</h1>
+            <div class="sub">Partner sample · fresh · density-gradient wash · 09 Jul 2026</div>
+          </div>
+          <div class="head-actions"><button class="btn"><svg class="ic" viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>Edit record</button></div>
+        </div>
+
+        <div class="stats">
+          <div class="stat"><div class="accent"></div><div class="lbl">Volume</div><div class="val">3.2 <span class="unit">mL</span></div></div>
+          <div class="stat"><div class="accent"></div><div class="lbl">Concentration</div><div class="val">42 <span class="unit">M/mL</span></div></div>
+          <div class="stat g"><div class="accent"></div><div class="lbl">Progressive motility</div><div class="val">58<span class="unit">%</span></div><div class="meta">post-wash</div></div>
+          <div class="stat"><div class="accent"></div><div class="lbl">Normal morphology</div><div class="val">6<span class="unit">%</span></div><div class="meta">strict criteria</div></div>
+        </div>
+
+        <div class="card">
+          <div class="card-h"><h3>Preparation record</h3><span class="badge b-green"><span class="d"></span>Suitable for ICSI</span></div>
+          <div class="card-b" style="padding:6px 18px 14px">
+            <div class="field-list" style="grid-template-columns:1fr 1fr 1fr">
+              <div class="field"><div class="fl">Semen source</div><div class="fv">Partner (Alex Sample)</div></div>
+              <div class="field"><div class="fl">Fresh / frozen</div><div class="fv">Fresh</div></div>
+              <div class="field"><div class="fl">Collection date</div><div class="fv mono">09 Jul 2026 · 08:10</div></div>
+              <div class="field"><div class="fl">Prep method</div><div class="fv">Density gradient</div></div>
+              <div class="field"><div class="fl">Quality grade</div><div class="fv">Good</div></div>
+              <div class="field"><div class="fl">Quantity used</div><div class="fv mono">1 × ICSI drop</div></div>
+              <div class="field"><div class="fl">Used for</div><div class="fv">ICSI · TC-2026-0417</div></div>
+              <div class="field"><div class="fl">3-point check</div><div class="fv">Verified · L. Chen</div></div>
+              <div class="field"><div class="fl">Prepared by</div><div class="fv">M. Ferreira</div></div>
+            </div>
+            <div class="note" style="margin-top:14px">The goal of preparation is to separate progressively motile sperm from seminal fluid, debris and non-motile cells. Post-wash motility of 58% supports ICSI selection.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ INSEMINATION & FERTILISATION ============ -->
+      <section class="view" data-view="fert">
+        <div class="page-head">
+          <div>
+            <div class="eyebrow">Procedure · Fertilisation check +18h</div>
+            <h1>Insemination &amp; Fertilisation</h1>
+            <div class="sub">ICSI on 8 MII oocytes · fertilisation assessed 10 Jul 08:00</div>
+          </div>
+        </div>
+
+        <div class="stats">
+          <div class="stat"><div class="accent"></div><div class="lbl">Method</div><div class="val" style="font-size:22px">ICSI</div><div class="meta">8 oocytes injected</div></div>
+          <div class="stat g"><div class="accent"></div><div class="lbl">Normal (2PN)</div><div class="val">6</div><div class="meta">2 pronuclei + 2 PB</div></div>
+          <div class="stat a"><div class="accent"></div><div class="lbl">Abnormal</div><div class="val">1</div><div class="meta">1PN</div></div>
+          <div class="stat"><div class="accent"></div><div class="lbl">Not fertilised</div><div class="val">1</div><div class="meta">0PN</div></div>
+        </div>
+
+        <div class="card">
+          <div class="card-h"><h3>Pronuclear (PN) status by oocyte</h3><span class="k">2PN = normal fertilisation</span></div>
+          <div class="card-b">
+            <div class="pn-board">
+              <div class="pn-cell norm"><div class="seq">OO-01</div><div class="pn">2PN</div><div class="st" style="color:var(--green)">Normal</div></div>
+              <div class="pn-cell norm"><div class="seq">OO-02</div><div class="pn">2PN</div><div class="st" style="color:var(--green)">Normal</div></div>
+              <div class="pn-cell norm"><div class="seq">OO-03</div><div class="pn">2PN</div><div class="st" style="color:var(--green)">Normal</div></div>
+              <div class="pn-cell norm"><div class="seq">OO-04</div><div class="pn">2PN</div><div class="st" style="color:var(--green)">Normal</div></div>
+              <div class="pn-cell norm"><div class="seq">OO-05</div><div class="pn">2PN</div><div class="st" style="color:var(--green)">Normal</div></div>
+              <div class="pn-cell norm"><div class="seq">OO-06</div><div class="pn">2PN</div><div class="st" style="color:var(--green)">Normal</div></div>
+              <div class="pn-cell abn"><div class="seq">OO-07</div><div class="pn">1PN</div><div class="st" style="color:var(--amber)">Abnormal</div></div>
+              <div class="pn-cell fail"><div class="seq">OO-08</div><div class="pn">0PN</div><div class="st" style="color:var(--slate)">Unfertilised</div></div>
+            </div>
+            <div class="note" style="margin-top:16px">At the fertilisation check (16-18h post-ICSI), a normally fertilised zygote shows <b>two pronuclei (2PN)</b> and two polar bodies. 1PN and 3PN are abnormal and excluded from culture. The six 2PN zygotes progressed to embryo culture.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ EMBRYO DEVELOPMENT (SIGNATURE) ============ -->
+      <section class="view" data-view="develop">
+        <div class="page-head">
+          <div>
+            <div class="eyebrow">Lab Culture · Day 5 of 5</div>
+            <h1>Embryo Development</h1>
+            <div class="sub">Daily grading from fertilisation to blastocyst · Gardner criteria · 6 embryos tracked</div>
+          </div>
+          <div class="head-actions">
+            <button class="btn"><svg class="ic" viewBox="0 0 24 24"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg>Time-lapse</button>
+            <button class="btn primary"><svg class="ic" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/></svg>Record Day 5</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-h"><h3>Embryo lifecycle grid</h3><span class="k">Stage · Grade · Fragmentation</span></div>
+          <div class="card-b" style="overflow-x:auto">
+            <div class="embryo-lanes" style="min-width:900px">
+              <div class="lane-head">
+                <div class="col embryo-col">Embryo</div>
+                <div class="col">Day 0</div><div class="col">Day 1</div><div class="col">Day 2</div><div class="col">Day 3</div>
+                <div class="col">Day 4</div><div class="col">Day 5 <span class="now-flag">NOW</span></div><div class="col">Day 6</div><div class="col">Day 7</div>
+                <div class="col fate-col">Fate</div>
+              </div>
+
+              <!-- E-01 -->
+              <div class="lane">
+                <div class="embryo-cell"><div class="seq">01</div><div><b>E-01</b><small>from OO-01</small></div></div>
+                <div class="daycell g-b"><span class="stage">2PN</span></div>
+                <div class="daycell g-b"><span class="stage">2c</span></div>
+                <div class="daycell g-a"><span class="stage">4c</span><span class="grade">G4</span><span class="frag">&lt;10%</span></div>
+                <div class="daycell g-a"><span class="stage">8c</span><span class="grade">G4</span><span class="frag">&lt;10%</span></div>
+                <div class="daycell g-a"><span class="stage">Mor</span></div>
+                <div class="daycell g-a now-day"><span class="stage">Bl</span><span class="grade">4AA</span></div>
+                <div class="daycell empty"></div>
+                <div class="daycell empty"></div>
+                <div class="fate-cell"><span class="badge b-aqua"><span class="d"></span>Transfer</span></div>
+              </div>
+
+              <!-- E-02 -->
+              <div class="lane">
+                <div class="embryo-cell"><div class="seq">02</div><div><b>E-02</b><small>from OO-02</small></div></div>
+                <div class="daycell g-b"><span class="stage">2PN</span></div>
+                <div class="daycell g-b"><span class="stage">2c</span></div>
+                <div class="daycell g-a"><span class="stage">4c</span><span class="grade">G4</span><span class="frag">&lt;10%</span></div>
+                <div class="daycell g-b"><span class="stage">7c</span><span class="grade">G3</span><span class="frag">10%</span></div>
+                <div class="daycell g-b"><span class="stage">Mor</span></div>
+                <div class="daycell g-a now-day"><span class="stage">Bl</span><span class="grade">4AB</span></div>
+                <div class="daycell empty"></div>
+                <div class="daycell empty"></div>
+                <div class="fate-cell"><span class="badge b-green"><span class="d"></span>Freeze</span></div>
+              </div>
+
+              <!-- E-03 -->
+              <div class="lane">
+                <div class="embryo-cell"><div class="seq">03</div><div><b>E-03</b><small>from OO-03</small></div></div>
+                <div class="daycell g-b"><span class="stage">2PN</span></div>
+                <div class="daycell g-b"><span class="stage">2c</span></div>
+                <div class="daycell g-b"><span class="stage">4c</span><span class="grade">G3</span><span class="frag">15%</span></div>
+                <div class="daycell g-b"><span class="stage">8c</span><span class="grade">G3</span><span class="frag">10%</span></div>
+                <div class="daycell g-b"><span class="stage">Cav</span></div>
+                <div class="daycell g-b now-day"><span class="stage">Bl</span><span class="grade">3BB</span></div>
+                <div class="daycell empty"></div>
+                <div class="daycell empty"></div>
+                <div class="fate-cell"><span class="badge b-green"><span class="d"></span>Freeze</span></div>
+              </div>
+
+              <!-- E-04 -->
+              <div class="lane">
+                <div class="embryo-cell"><div class="seq">04</div><div><b>E-04</b><small>from OO-04</small></div></div>
+                <div class="daycell g-b"><span class="stage">2PN</span></div>
+                <div class="daycell g-b"><span class="stage">2c</span></div>
+                <div class="daycell g-a"><span class="stage">4c</span><span class="grade">G4</span><span class="frag">&lt;10%</span></div>
+                <div class="daycell g-a"><span class="stage">8c</span><span class="grade">G4</span><span class="frag">&lt;10%</span></div>
+                <div class="daycell g-a"><span class="stage">Mor</span></div>
+                <div class="daycell g-c now-day"><span class="stage">eBl</span><span class="grade">2BB</span></div>
+                <div class="daycell empty"></div>
+                <div class="daycell empty"></div>
+                <div class="fate-cell"><span class="badge b-purple"><span class="d"></span>Culture on</span></div>
+              </div>
+
+              <!-- E-05 -->
+              <div class="lane">
+                <div class="embryo-cell"><div class="seq">05</div><div><b>E-05</b><small>from OO-05</small></div></div>
+                <div class="daycell g-b"><span class="stage">2PN</span></div>
+                <div class="daycell g-b"><span class="stage">2c</span></div>
+                <div class="daycell g-c"><span class="stage">3c</span><span class="grade">G2</span><span class="frag">25%</span></div>
+                <div class="daycell g-c"><span class="stage">5c</span><span class="grade">G2</span><span class="frag">30%</span></div>
+                <div class="daycell g-c"><span class="stage">Arr</span></div>
+                <div class="daycell stop now-day"><span class="stage">Arr</span><span class="grade">—</span></div>
+                <div class="daycell empty"></div>
+                <div class="daycell empty"></div>
+                <div class="fate-cell"><span class="badge b-red"><span class="d"></span>Discard</span></div>
+              </div>
+
+              <!-- E-06 -->
+              <div class="lane">
+                <div class="embryo-cell"><div class="seq">06</div><div><b>E-06</b><small>from OO-06</small></div></div>
+                <div class="daycell g-b"><span class="stage">2PN</span></div>
+                <div class="daycell g-b"><span class="stage">2c</span></div>
+                <div class="daycell g-b"><span class="stage">4c</span><span class="grade">G3</span><span class="frag">15%</span></div>
+                <div class="daycell g-c"><span class="stage">6c</span><span class="grade">G2</span><span class="frag">20%</span></div>
+                <div class="daycell g-c"><span class="stage">Cav</span></div>
+                <div class="daycell g-c now-day"><span class="stage">eBl</span><span class="grade">2BC</span></div>
+                <div class="daycell empty"></div>
+                <div class="daycell empty"></div>
+                <div class="fate-cell"><span class="badge b-purple"><span class="d"></span>Culture on</span></div>
+              </div>
+            </div>
+
+            <div style="display:flex;gap:20px;flex-wrap:wrap;margin-top:16px;font-size:11.5px;color:var(--muted)">
+              <span><b style="color:var(--ink);font-family:Montserrat">Stage key:</b> 2PN zygote · 2-8c cleavage · Mor morula · Cav cavitating · eBl early blast · Bl blastocyst · Arr arrested</span>
+            </div>
+            <div class="note" style="margin-top:12px">Grades follow the Gardner blastocyst system: expansion 1-6, then inner cell mass (A-C) and trophectoderm (A-C). <b>4AA</b> is an expanded blastocyst with top-quality ICM and trophectoderm. Cell fragmentation above ~25% signals reduced viability.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ EMBRYO TRANSFER ============ -->
+      <section class="view" data-view="transfer">
+        <div class="page-head">
+          <div>
+            <div class="eyebrow">Procedure · ET-2026-0417 · Planned 13:30</div>
+            <h1>Embryo Transfer</h1>
+            <div class="sub">Fresh single blastocyst transfer · Dr. Mensah loads catheter prepared by A. Okafor</div>
+          </div>
+          <div class="head-actions"><button class="btn primary"><svg class="ic" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/></svg>Confirm &amp; record</button></div>
+        </div>
+
+        <div class="two">
+          <div class="card">
+            <div class="card-h"><h3>Selected embryo</h3><span class="badge b-aqua"><span class="d"></span>Top graded</span></div>
+            <div class="card-b">
+              <div style="display:flex;gap:18px;align-items:center;padding:6px 0 14px">
+                <div style="width:80px;height:80px;border-radius:16px;background:var(--aqua-soft);border:1px solid var(--aqua-line);display:grid;place-items:center;font-family:Montserrat;font-weight:800;font-size:22px;color:var(--aqua-deep)">4AA</div>
+                <div>
+                  <div style="font-family:Montserrat;font-weight:800;font-size:20px">Embryo E-01</div>
+                  <div style="color:var(--muted);font-size:13px;margin-top:2px">Day 5 expanded blastocyst · from oocyte OO-01</div>
+                  <div style="margin-top:8px;display:flex;gap:6px"><span class="badge b-green"><span class="d"></span>ICM: A</span><span class="badge b-green"><span class="d"></span>TE: A</span><span class="badge b-aqua"><span class="d"></span>Expansion 4</span></div>
+                </div>
+              </div>
+              <div class="field-list">
+                <div class="field"><div class="fl">Transfer type</div><div class="fv">Fresh</div></div>
+                <div class="field"><div class="fl">Transfer order</div><div class="fv">1 of 1 (eSET)</div></div>
+                <div class="field"><div class="fl">Catheter</div><div class="fv">Soft · trial passed</div></div>
+                <div class="field"><div class="fl">Doctor</div><div class="fv">Dr. R. Mensah</div></div>
+                <div class="field"><div class="fl">Embryologist</div><div class="fv">A. Okafor</div></div>
+                <div class="field"><div class="fl">3-point check</div><div class="fv">Awaiting witness</div></div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-h"><h3>Remaining cohort</h3></div>
+            <div class="card-b" style="padding:8px 14px">
+              <table>
+                <tbody style="font-size:12.5px">
+                  <tr><td><span class="id">E-02</span> · 4AB</td><td style="text-align:right"><span class="badge b-green"><span class="d"></span>Freeze</span></td></tr>
+                  <tr><td><span class="id">E-03</span> · 3BB</td><td style="text-align:right"><span class="badge b-green"><span class="d"></span>Freeze</span></td></tr>
+                  <tr><td><span class="id">E-04</span> · 2BB</td><td style="text-align:right"><span class="badge b-purple"><span class="d"></span>Culture on</span></td></tr>
+                  <tr><td><span class="id">E-06</span> · 2BC</td><td style="text-align:right"><span class="badge b-purple"><span class="d"></span>Culture on</span></td></tr>
+                  <tr><td><span class="id">E-05</span> · arrested</td><td style="text-align:right"><span class="badge b-red"><span class="d"></span>Discard</span></td></tr>
+                </tbody>
+              </table>
+              <div class="note" style="margin:12px 8px">Any embryo not transferred, frozen or discarded on the day is carried over to the next day of culture and re-assessed.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ CRYO TANK ============ -->
+      <section class="view" data-view="tank">
+        <div class="page-head">
+          <div>
+            <div class="eyebrow">Cryo Storage · Riverside site</div>
+            <h1>Cryo Tank View</h1>
+            <div class="sub">Tank LN2-03 · vapour phase · 8 canisters · live occupancy</div>
+          </div>
+          <div class="head-actions"><button class="btn"><svg class="ic" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-9-9c2.5 0 4.7 1 6.4 2.6L21 3"/></svg>Refresh</button></div>
+        </div>
+
+        <div class="stats">
+          <div class="stat"><div class="accent"></div><div class="lbl">Capacity</div><div class="val">480</div><div class="meta">straw positions</div></div>
+          <div class="stat a"><div class="accent"></div><div class="lbl">Occupied</div><div class="val">331</div><div class="meta">69% full</div></div>
+          <div class="stat g"><div class="accent"></div><div class="lbl">Available</div><div class="val">149</div></div>
+          <div class="stat"><div class="accent"></div><div class="lbl">LN2 level</div><div class="val">92<span class="unit">%</span></div><div class="meta">last fill 13 Jul</div></div>
+        </div>
+
+        <div class="tank-layout">
+          <div class="tank-visual">
+            <svg class="tank-svg" viewBox="0 0 120 150">
+              <defs><linearGradient id="ln2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6bbdb4"/><stop offset="1" stop-color="#2f7d76"/></linearGradient></defs>
+              <rect x="30" y="8" width="60" height="10" rx="3" fill="#cfe6e2"/>
+              <path d="M25 18 h70 a6 6 0 0 1 6 6 v104 a14 14 0 0 1-14 14 h-54 a14 14 0 0 1-14-14 v-104 a6 6 0 0 1 6-6 z" fill="#eaf5f3" stroke="#cfe6e2" stroke-width="2"/>
+              <path d="M25 100 h70 v28 a14 14 0 0 1-14 14 h-42 a14 14 0 0 1-14-14 z" fill="url(#ln2)" opacity="0.85"/>
+              <text x="60" y="120" text-anchor="middle" font-family="JetBrains Mono" font-weight="600" font-size="8" fill="#fff">LN2 92%</text>
+              <text x="60" y="55" text-anchor="middle" font-family="Montserrat" font-weight="700" font-size="9" fill="#2f7d76">LN2-03</text>
+              <text x="60" y="68" text-anchor="middle" font-family="Lato" font-size="6" fill="#6c7c7a">vapour phase</text>
+            </svg>
+            <div class="goblet-legend">
+              <span><i style="background:var(--green)"></i>&lt;60%</span>
+              <span><i style="background:var(--amber)"></i>60-85%</span>
+              <span><i style="background:var(--red)"></i>&gt;85%</span>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-h"><h3>Canister occupancy</h3><span class="k">Tap a canister for goblet detail</span></div>
+            <div class="card-b">
+              <div class="canister-grid">
+                <div class="canister high"><span class="cn">C1</span><span class="fill-txt">54/60</span><span class="bar"><i style="width:90%"></i></span></div>
+                <div class="canister high"><span class="cn">C2</span><span class="fill-txt">51/60</span><span class="bar"><i style="width:85%"></i></span></div>
+                <div class="canister med"><span class="cn">C3</span><span class="fill-txt">44/60</span><span class="bar"><i style="width:73%"></i></span></div>
+                <div class="canister med"><span class="cn">C4</span><span class="fill-txt">40/60</span><span class="bar"><i style="width:67%"></i></span></div>
+                <div class="canister med"><span class="cn">C5</span><span class="fill-txt">38/60</span><span class="bar"><i style="width:63%"></i></span></div>
+                <div class="canister low"><span class="cn">C6</span><span class="fill-txt">31/60</span><span class="bar"><i style="width:52%"></i></span></div>
+                <div class="canister low"><span class="cn">C7</span><span class="fill-txt">20/60</span><span class="bar"><i style="width:33%"></i></span></div>
+                <div class="canister low"><span class="cn">C8</span><span class="fill-txt">13/60</span><span class="bar"><i style="width:22%"></i></span></div>
+              </div>
+              <div class="note" style="margin-top:16px">Selected canister <b>C6</b> holds goblets G1-G6. This cycle's blastocysts E-02 and E-03 are allocated to <b>LN2-03 / C6 / G3 / straw 14-15</b> pending the outstanding cryostorage consent.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ STORAGE INVENTORY ============ -->
+      <section class="view" data-view="inventory">
+        <div class="page-head">
+          <div>
+            <div class="eyebrow">Cryo Storage · Frozen specimen register</div>
+            <h1>Storage Inventory</h1>
+            <div class="sub">All specimens held for this patient across sites · 38 site total</div>
+          </div>
+          <div class="head-actions"><button class="btn"><svg class="ic" viewBox="0 0 24 24"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5h20v5a2 2 0 0 1-2 2h-2M6 14h12v8H6z"/></svg>Print labels</button></div>
+        </div>
+
+        <div class="card">
+          <div class="card-h"><h3>Frozen specimens</h3><span class="k">Patient: SAMPLE, Jane</span></div>
+          <table>
+            <thead><tr><th>Specimen</th><th>Type</th><th>Cycle</th><th>Location</th><th>Frozen</th><th>Grade</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td class="id">EMB-88213</td><td>Embryo</td><td class="mono" style="font-size:12px">TC-2026-0417</td><td class="mono" style="font-size:12px">LN2-03 / C6 / G3 / 14</td><td class="mono" style="font-size:12px">pending</td><td><b>4AB</b></td><td><span class="badge b-slate"><span class="d"></span>Queued</span></td></tr>
+              <tr><td class="id">EMB-88214</td><td>Embryo</td><td class="mono" style="font-size:12px">TC-2026-0417</td><td class="mono" style="font-size:12px">LN2-03 / C6 / G3 / 15</td><td class="mono" style="font-size:12px">pending</td><td><b>3BB</b></td><td><span class="badge b-slate"><span class="d"></span>Queued</span></td></tr>
+              <tr><td class="id">EMB-71005</td><td>Embryo</td><td class="mono" style="font-size:12px">TC-2024-1180</td><td class="mono" style="font-size:12px">LN2-01 / C2 / G4 / 07</td><td class="mono" style="font-size:12px">18 Nov 2024</td><td><b>4AA</b></td><td><span class="badge b-green"><span class="d"></span>Stored</span></td></tr>
+              <tr><td class="id">OOC-40922</td><td>Oocyte ×4</td><td class="mono" style="font-size:12px">TC-2023-0551</td><td class="mono" style="font-size:12px">LN2-01 / C5 / G1 / 22</td><td class="mono" style="font-size:12px">03 Mar 2023</td><td>MII</td><td><span class="badge b-green"><span class="d"></span>Stored</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="hint"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg> Freeze of EMB-88213 / 88214 is blocked until the cryostorage renewal consent is signed.</div>
+      </section>
+
+      <!-- ============ WITNESSING LOG ============ -->
+      <section class="view" data-view="witnessing">
+        <div class="page-head">
+          <div>
+            <div class="eyebrow">Governance · Chain of custody</div>
+            <h1>Witnessing Log</h1>
+            <div class="sub">Immutable record of every witnessed step · this cycle</div>
+          </div>
+          <div class="head-actions"><button class="btn"><svg class="ic" viewBox="0 0 24 24"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5h20v5a2 2 0 0 1-2 2h-2M6 14h12v8H6z"/></svg>Export audit</button></div>
+        </div>
+
+        <div class="card">
+          <div class="card-h"><h3>Verification events</h3><span class="k">TC-2026-0417</span></div>
+          <table>
+            <thead><tr><th>Timestamp</th><th>Step</th><th>Specimen</th><th>Operator</th><th>Witness</th><th>Outcome</th></tr></thead>
+            <tbody>
+              <tr><td class="mono" style="font-size:12px">09 Jul 07:31</td><td>Egg Collection</td><td class="mono" style="font-size:12px">11 oocytes</td><td>A. Okafor</td><td>L. Chen</td><td><span class="badge b-green"><span class="d"></span>Confirmed</span></td></tr>
+              <tr><td class="mono" style="font-size:12px">09 Jul 08:12</td><td>Semen Collection</td><td class="mono" style="font-size:12px">Partner fresh</td><td>M. Ferreira</td><td>L. Chen</td><td><span class="badge b-green"><span class="d"></span>Confirmed</span></td></tr>
+              <tr><td class="mono" style="font-size:12px">09 Jul 09:04</td><td>ICSI Insemination</td><td class="mono" style="font-size:12px">8 MII</td><td>A. Okafor</td><td>L. Chen</td><td><span class="badge b-green"><span class="d"></span>Confirmed</span></td></tr>
+              <tr><td class="mono" style="font-size:12px">10 Jul 08:02</td><td>Fertilisation Check</td><td class="mono" style="font-size:12px">6 × 2PN</td><td>A. Okafor</td><td>M. Ferreira</td><td><span class="badge b-green"><span class="d"></span>Confirmed</span></td></tr>
+              <tr><td class="mono" style="font-size:12px">12 Jul 08:35</td><td>Day 3 dish change</td><td class="mono" style="font-size:12px">6 embryos</td><td>A. Okafor</td><td>L. Chen</td><td><span class="badge b-green"><span class="d"></span>Confirmed</span></td></tr>
+              <tr><td class="mono" style="font-size:12px">14 Jul 11:03</td><td>Embryo Transfer prep</td><td class="mono" style="font-size:12px">E-04 → E-01</td><td>A. Okafor</td><td>L. Chen</td><td><span class="badge b-amber"><span class="d"></span>Awaiting</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <div class="footer-note">
+        <span>OX.ar Embryo Module · UI prototype · synthetic data for demonstration</span>
+        <span class="mono">Connecting patients · doctors · data</span>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<script>
+const navItems = document.querySelectorAll('.nav-item');
+const views = document.querySelectorAll('.view');
+navItems.forEach(item=>{
+  item.addEventListener('click',()=>{
+    const v = item.dataset.view;
+    navItems.forEach(n=>n.classList.remove('active'));
+    item.classList.add('active');
+    views.forEach(view=>view.classList.toggle('active', view.dataset.view===v));
+    document.querySelector('.main').scrollTop = 0;
+  });
+});
+// Worklist filter chips (visual toggle only in prototype)
+document.querySelectorAll('.filters .chip').forEach(chip=>{
+  chip.addEventListener('click',()=>{
+    chip.parentElement.querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));
+    chip.classList.add('on');
+  });
+});
+// Canister select
+document.querySelectorAll('.canister').forEach(c=>{
+  c.addEventListener('click',()=>{
+    document.querySelectorAll('.canister').forEach(x=>x.style.outline='');
+    c.style.outline='2px solid var(--aqua)';
+  });
+});
+</script>
+</body>
+</html>
