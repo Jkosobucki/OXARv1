@@ -233,6 +233,68 @@ namespace OXAR.Services.CryoTank
             }
         }
 
+        /// <summary>
+        /// Inventory = the frozen specimens (bcrm_egg) stored in this tank. Derived, not a table
+        /// (01-DATA-MODEL.md sheet 20). Scoped by the tank reference on the specimen
+        /// (bcrm_nitrogen_tank). Confirm that column's type/name against the live schema — if it is
+        /// a text field rather than a lookup, filter by tank name instead of the guid.
+        /// </summary>
+        public object GetInventory(string tankId)
+        {
+            try
+            {
+                logger.Info("Type: Info, Location: CryoTankService, Method: GetInventory, Action: Starting..");
+                var fetchXML = string.Format(@"
+                    <fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='false'>
+                      <entity name='bcrm_egg'>
+                        <attribute name='bcrm_eggid' />
+                        <attribute name='bcrm_eggs_id' />
+                        <attribute name='bcrm_type' />
+                        <attribute name='bcrm_patient' />
+                        <attribute name='bcrm_treatment_cycle' />
+                        <attribute name='bcrm_freeze_date' />
+                        <attribute name='bcrm_location' />
+                        <attribute name='bcrm_goblet' />
+                        <attribute name='bcrm_straw' />
+                        <attribute name='bcrm_egg_status' />
+                        <order attribute='bcrm_freeze_date' descending='true' />
+                        <filter type='and'>
+                          <condition attribute='bcrm_frozen' operator='eq' value='1' />
+                          <condition attribute='bcrm_nitrogen_tank' operator='eq' value='{0}' />
+                        </filter>
+                      </entity>
+                    </fetch>", tankId);
+
+                dynamic result = new List<ExpandoObject>();
+                var rows = _unitOfWork.CRMCoreRepository.Get(fetchXML);
+                if (rows != null && rows.Entities != null)
+                {
+                    foreach (var x in rows.Entities)
+                    {
+                        dynamic a = new ExpandoObject();
+                        a.Id = x.Id.ToString();
+                        a.SpecimenId = Str(x, "bcrm_eggs_id");
+                        a.Type = Label(x, "bcrm_type");
+                        a.Patient = RefName(x, "bcrm_patient");
+                        a.TreatmentCycle = RefName(x, "bcrm_treatment_cycle");
+                        a.FreezeDate = Date(x, "bcrm_freeze_date");
+                        a.Location = Str(x, "bcrm_location");
+                        a.Goblet = Str(x, "bcrm_goblet");
+                        a.Straw = Str(x, "bcrm_straw");
+                        a.Status = Str(x, "bcrm_egg_status");
+                        ((List<ExpandoObject>)result).Add(a);
+                    }
+                }
+                logger.Info("Type: Info, Location: CryoTankService, Method: GetInventory, Action: Completed.");
+                return result;
+            }
+            catch (Exception ex)
+            {
+                logger.Error("Type: Error, Location: CryoTankService, Method: GetInventory, Error: " + ex.Message);
+                throw;
+            }
+        }
+
         private static void Guard(object dto)
         {
             var obj = JObject.Parse(JsonConvert.SerializeObject(dto));
