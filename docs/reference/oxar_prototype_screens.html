@@ -121,6 +121,17 @@ button{font-family:inherit;cursor:pointer}
 .f .val.ro{background:var(--slate-soft);color:var(--muted)}
 .f .val select{border:none;background:none;font:inherit;color:inherit;width:100%;outline:none}
 .req{color:var(--red);margin-left:3px}
+/* Test couple banner */
+.couple{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px}
+.person{display:flex;align-items:center;gap:11px;padding:10px 14px;border:1px solid var(--line);border-radius:var(--radius);background:var(--card);box-shadow:var(--shadow);min-width:250px}
+.person .av{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;color:#fff;font-family:var(--hd);font-weight:700;font-size:13px}
+.person.p1 .av{background:linear-gradient(135deg,var(--aqua),var(--aqua-deep))}
+.person.p2 .av{background:linear-gradient(135deg,var(--purple),#5a44a0)}
+.person .rol{font-family:var(--hd);font-weight:700;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.person .nm{font-family:var(--hd);font-weight:700;font-size:14px}
+.person .meta{font-size:11.5px;color:var(--muted)}
+.person.muted{opacity:.5}
+.person .meta .mono{font-family:var(--mo)}
 
 /* Plan panel */
 .panel h4{font-size:12px;font-family:var(--hd);font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--aqua-deep);margin-bottom:10px}
@@ -249,56 +260,10 @@ tr:last-child td{border-bottom:none}
 
         <div class="tabstrip" id="tabstrip"></div>
 
+        <div class="couple" id="couple"></div>
+
         <div class="grid2">
-          <div class="card"><div class="card-b">
-            <div class="section">
-              <div class="sh">Cycle Information</div>
-              <div class="fields">
-                <div class="f" data-f="name"><label>Treatment Name<span class="req">*</span></label><div class="val">IVF — Long protocol (DEMO)</div></div>
-                <div class="f" data-f="type"><label>Treatment Type<span class="req">*</span></label><div class="val mono" id="typeEcho">IVF</div></div>
-                <div class="f" data-f="seq"><label>Cycle Sequence Number</label><div class="val mono ro">CY-1183</div></div>
-                <div class="f" data-f="billing"><label>Treatment Billing Option<span class="req">*</span></label><div class="val">Self-funded</div></div>
-                <div class="f" data-f="anzard"><label>ANZARD Cycle Type</label><div class="val">Stimulated — fresh</div></div>
-                <div class="f" data-f="template"><label>Treatment Template</label><div class="val">Standard ICSI, Day 5</div></div>
-              </div>
-            </div>
-            <div class="section">
-              <div class="sh">People</div>
-              <div class="fields">
-                <div class="f" data-f="patient"><label>Patient<span class="req">*</span></label><div class="val">SAMPLE, Priya (DEMO)</div></div>
-                <div class="f" data-f="partner"><label>Partner</label><div class="val">SAMPLE, Alex (DEMO)</div></div>
-                <div class="f" data-f="doctor"><label>Cycle Doctor<span class="req">*</span></label><div class="val">Dr M. Osei</div></div>
-                <div class="f" data-f="nurse"><label>Cycle Nurse</label><div class="val">Nurse R. Nolan</div></div>
-                <div class="f" data-f="rxgroup"><label>Patient RX Group<span class="req">*</span></label><div class="val">Group B</div></div>
-              </div>
-            </div>
-            <div class="section">
-              <div class="sh">Clinic &amp; Dates</div>
-              <div class="fields">
-                <div class="f" data-f="mclinic"><label>Managing Clinic</label><div class="val">OX.ar City (DEMO)</div></div>
-                <div class="f" data-f="pclinic"><label>Procedure Clinic</label><div class="val">OX.ar City Lab</div></div>
-                <div class="f" data-f="startdate"><label>Expected Start Date</label><div class="val mono">14 Jul 2026</div></div>
-                <div class="f" data-f="treatdate"><label>Expected Treatment Date</label><div class="val mono">28 Jul 2026</div></div>
-              </div>
-            </div>
-            <div class="section" data-f="diagnosis">
-              <div class="sh">Infertility Diagnosis</div>
-              <div class="fields">
-                <div class="f" data-f="femdx"><label>Female Infertility Diagnosis</label><div class="val">Tubal factor</div></div>
-                <div class="f" data-f="maledx"><label>Male Infertility Diagnosis</label><div class="val">Mild oligospermia</div></div>
-                <div class="f" data-f="dxcomment"><label>Diagnosis Comment</label><div class="val">—</div></div>
-              </div>
-            </div>
-            <div class="section">
-              <div class="sh">Plan</div>
-              <div class="fields">
-                <div class="f" data-f="eventtpl"><label>Event Template (seeds worklist)</label><div class="val">IVF Standard</div></div>
-                <div class="f" data-f="research"><label>Research Project</label><div class="val">PROTO time-lapse study</div></div>
-                <div class="f" data-f="spermsource"><label>Sperm Source</label><div class="val">Partner (fresh)</div></div>
-                <div class="f" data-f="numembryos"><label>No. of Embryos to Replace</label><div class="val mono">1</div></div>
-              </div>
-            </div>
-          </div></div>
+          <div class="card"><div class="card-b" id="planForm"></div></div>
 
           <div class="card panel"><div class="card-b">
             <h4 id="planTitle">Plan for this cycle</h4>
@@ -417,56 +382,159 @@ tr:last-child td{border-bottom:none}
 </div>
 
 <script>
-/* ---------- Treatment-type templates (mirrors treatment-type-display-templates.json) ---------- */
-const TYPES = {
-  "IVF":{steps:["Consent & 3PC","Stimulation","Folliculogram","Trigger","OPU","Semen Prep","Insemination","Fertilisation","Culture D2–7","Transfer","Freeze","Outcome"],
-    hideTabs:["IUI/DI"], hideFields:[]},
-  "Egg Only":{steps:["Consent & 3PC","Stimulation","Folliculogram","Trigger","OPU","Denuding / MII","Vitrify Oocytes","Storage"],
-    hideTabs:["Embryo Transfer","IUI/DI","Lab Results","Outcome Data"], hideFields:["partner","spermsource","numembryos","maledx"]},
-  "Embryo Transfer":{steps:["Consent & 3PC","Endo Prep / Lining","Select Embryo","Embryo Thaw","3PC","Transfer","Outcome"],
-    hideTabs:["Oocyte Retrieval","IUI/DI","Lab Results"], hideFields:["spermsource"]},
-  "VOT":{steps:["Consent & 3PC","Select Frozen Eggs","Oocyte Thaw","Survival","Semen Prep","ICSI","Fertilisation","Culture","Transfer / Freeze","Outcome"],
-    hideTabs:["Oocyte Retrieval","Folliculogram","IUI/DI"], hideFields:[]},
-  "IUI":{steps:["Consent & 3PC","OI / Natural","Folliculogram","Trigger","Semen Prep","IUI Insemination","Outcome"],
-    hideTabs:["Oocyte Retrieval","Embryo Transfer","Lab Results","Stored Sample"], hideFields:["numembryos"]},
-  "Ovulation Induction":{steps:["Consent","OI Drugs","Folliculogram","Trigger","Timed Intercourse","Outcome"],
-    hideTabs:["Oocyte Retrieval","Embryo Transfer","IUI/DI","Gametes","Lab Results","Stored Sample"], hideFields:["spermsource","numembryos","partner"]},
-  "Tracking":{steps:["Folliculogram Tracking","LH & Trigger Monitoring","Outcome / Hand-off"],
-    hideTabs:["Oocyte Retrieval","Embryo Transfer","IUI/DI","Gametes","Lab Results","Stored Sample"], hideFields:["partner","spermsource","numembryos","diagnosis"]},
-  "Thaw and Refreeze":{steps:["Consent & 3PC","Select Specimen","Thaw","Assess (± Biopsy)","Refreeze","Storage","Witnessing"],
-    hideTabs:["Folliculogram","Drugs","Oocyte Retrieval","Embryo Transfer","IUI/DI","Lab Results","Outcome Data"], hideFields:["spermsource","numembryos","diagnosis"]}
-};
-const ALL_TABS = ["Planning","Folliculogram","Drugs","Oocyte Retrieval","Semen","Lab Results","Embryo Transfer","IUI/DI","Gametes","Stored Sample","Outcome Data","Checklists"];
+/* ================= TEST COUPLE (synthetic) ================= */
+const PATIENT = {role:"Patient", name:"Priya Sample (DEMO)", init:"PS", meta:"NHR-0042 · F · DOB 12 Mar 1991 (35)"};
+const PARTNER = {role:"Partner", name:"Alex Sample (DEMO)", init:"AS", meta:"NHR-0043 · M · DOB 04 Aug 1988 (37)"};
 
+/* ================= TEMPLATE DEFINITIONS =================
+   One entry per treatment type — this is the same definition expressed, tab-per-type,
+   in OXar_Treatment_Type_Templates.xlsx. The planning form is RENDERED from this. */
+const ALL_TABS = ["Planning","Folliculogram","Drugs","Oocyte Retrieval","Semen","Lab Results","Embryo Transfer","IUI/DI","Gametes","Stored Sample","Outcome Data","Checklists"];
+const F=(label,value,opt={})=>({label,value,req:!!opt.req,mono:!!opt.mono});
+
+const TEMPLATES = {
+"IVF":{purpose:"Full stimulated cycle — collect eggs, fertilise, transfer / freeze.",
+  usesPartner:true,
+  steps:["Consent & 3PC","Stimulation","Folliculogram","Trigger","OPU","Semen Prep","Insemination (ICSI)","Fertilisation","Culture D2–7","Transfer","Freeze surplus","Outcome"],
+  tabsHide:["IUI/DI"],
+  sections:[
+    {name:"Cycle Information",fields:[F("Treatment Name","IVF — Antagonist protocol",{req:1}),F("Treatment Type","IVF",{req:1,mono:1}),F("Cycle Sequence No","CY-1183",{mono:1}),F("Billing Option","Self-funded",{req:1}),F("ANZARD Cycle Type","Stimulated — fresh"),F("Treatment Template","Standard ICSI, Day 5")]},
+    {name:"People",fields:[F("Patient",PATIENT.name,{req:1}),F("Partner",PARTNER.name),F("Cycle Doctor","Dr M. Osei",{req:1}),F("Cycle Nurse","R. Nolan"),F("Patient RX Group","Group B",{req:1})]},
+    {name:"Clinic & Dates",fields:[F("Managing Clinic","OX.ar City (DEMO)"),F("Procedure Clinic","OX.ar City Lab"),F("Expected Start","14 Jul 2026",{mono:1}),F("First Injection","16 Jul 2026",{mono:1}),F("Expected OPU","28 Jul 2026",{mono:1})]},
+    {name:"Infertility Diagnosis",fields:[F("Female Diagnosis","Tubal factor"),F("Male Diagnosis","Mild oligospermia"),F("Comment","—")]},
+    {name:"Plan",fields:[F("Event Template","IVF Standard"),F("Research Project","PROTO time-lapse study"),F("Sperm Source","Partner (fresh)"),F("Insemination Method","ICSI"),F("No. Embryos to Replace","1",{mono:1})]}
+  ]},
+
+"Egg Only":{purpose:"Egg freezing / fertility preservation — collect & vitrify oocytes (no fertilisation).",
+  usesPartner:false,
+  steps:["Consent & 3PC","Stimulation","Folliculogram","Trigger","OPU","Denuding / MII","Vitrify Oocytes","Storage"],
+  tabsHide:["Embryo Transfer","IUI/DI","Lab Results","Outcome Data"],
+  sections:[
+    {name:"Cycle Information",fields:[F("Treatment Name","Egg Freezing",{req:1}),F("Treatment Type","Egg Only",{req:1,mono:1}),F("Cycle Sequence No","CY-1184",{mono:1}),F("Billing Option","Self-funded",{req:1}),F("ANZARD Cycle Type","Stimulated — freeze all"),F("Treatment Template","Egg Freezing")]},
+    {name:"People",fields:[F("Patient",PATIENT.name,{req:1}),F("Cycle Doctor","Dr M. Osei",{req:1}),F("Cycle Nurse","R. Nolan"),F("Patient RX Group","Group B",{req:1})]},
+    {name:"Clinic & Dates",fields:[F("Managing Clinic","OX.ar City (DEMO)"),F("Procedure Clinic","OX.ar City Lab"),F("Expected Start","14 Jul 2026",{mono:1}),F("First Injection","16 Jul 2026",{mono:1}),F("Expected OPU","28 Jul 2026",{mono:1})]},
+    {name:"Indication",fields:[F("Reason","Elective fertility preservation"),F("AMH Validated","Yes — 18.2 pmol/L")]},
+    {name:"Plan",fields:[F("Event Template","Egg Freezing"),F("Research Project","—"),F("Freeze Method","Vitrification"),F("Target eggs to store","≥ 10 MII")]}
+  ]},
+
+"Embryo Transfer":{purpose:"Frozen embryo transfer (FET) — thaw a stored embryo and transfer.",
+  usesPartner:true,
+  steps:["Consent & 3PC","Endometrial Prep / Lining","Select Embryo","Embryo Thaw","3PC","Transfer","Outcome"],
+  tabsHide:["Oocyte Retrieval","IUI/DI","Lab Results"],
+  sections:[
+    {name:"Cycle Information",fields:[F("Treatment Name","FET — Medicated",{req:1}),F("Treatment Type","Embryo Transfer",{req:1,mono:1}),F("Cycle Sequence No","CY-1185",{mono:1}),F("Billing Option","Medicare + gap",{req:1}),F("ANZARD Cycle Type","FET"),F("Treatment Template","FET (Frozen Embryo Transfer)")]},
+    {name:"People",fields:[F("Patient",PATIENT.name,{req:1}),F("Partner",PARTNER.name),F("Cycle Doctor","Dr M. Osei",{req:1}),F("Cycle Nurse","R. Nolan"),F("Patient RX Group","Group B",{req:1})]},
+    {name:"Clinic & Dates",fields:[F("Managing Clinic","OX.ar City (DEMO)"),F("Lining Check","22 Jul 2026",{mono:1}),F("Expected Transfer","29 Jul 2026",{mono:1})]},
+    {name:"Plan",fields:[F("Event Template","FET"),F("Endometrial Prep","Medicated (HRT)"),F("Selected Embryo","EMB-1042 · Blast 4AA · Day 5",{mono:1}),F("No. Embryos to Replace","1",{mono:1})]}
+  ]},
+
+"VOT":{purpose:"Vitrified Oocyte Thaw (confirm meaning) — thaw frozen eggs → ICSI → culture → transfer.",
+  usesPartner:true, note:"VOT is a site-specific acronym — confirm with MIVF/SME.",
+  steps:["Consent & 3PC","Select Frozen Eggs","Oocyte Thaw","Survival Check","Semen Prep","ICSI","Fertilisation","Culture","Transfer / Freeze","Outcome"],
+  tabsHide:["Oocyte Retrieval","Folliculogram","IUI/DI"],
+  sections:[
+    {name:"Cycle Information",fields:[F("Treatment Name","VOT — thaw & ICSI",{req:1}),F("Treatment Type","VOT",{req:1,mono:1}),F("Cycle Sequence No","CY-1186",{mono:1}),F("Billing Option","Self-funded",{req:1}),F("ANZARD Cycle Type","Thaw oocytes"),F("Treatment Template","Vitrified Oocyte Thaw")]},
+    {name:"People",fields:[F("Patient",PATIENT.name,{req:1}),F("Partner",PARTNER.name),F("Cycle Doctor","Dr M. Osei",{req:1}),F("Patient RX Group","Group B",{req:1})]},
+    {name:"Clinic & Dates",fields:[F("Managing Clinic","OX.ar City (DEMO)"),F("Expected Thaw","26 Jul 2026",{mono:1}),F("Expected Transfer","31 Jul 2026",{mono:1})]},
+    {name:"Plan",fields:[F("Event Template","VOT"),F("Frozen Oocytes to Thaw","6 (MII)",{mono:1}),F("Sperm Source","Partner (fresh)"),F("Insemination Method","ICSI"),F("No. Embryos to Replace","1",{mono:1})]}
+  ]},
+
+"IUI":{purpose:"Intrauterine insemination — prepared sperm placed in the uterus (no egg collection).",
+  usesPartner:true,
+  steps:["Consent & 3PC","OI / Natural","Folliculogram","Trigger","Semen Prep","IUI Insemination","Outcome"],
+  tabsHide:["Oocyte Retrieval","Embryo Transfer","Lab Results","Stored Sample"],
+  sections:[
+    {name:"Cycle Information",fields:[F("Treatment Name","IUI — Natural cycle",{req:1}),F("Treatment Type","IUI",{req:1,mono:1}),F("Cycle Sequence No","CY-1187",{mono:1}),F("Billing Option","Self-funded",{req:1}),F("ANZARD Cycle Type","IUI"),F("Treatment Template","IUI")]},
+    {name:"People",fields:[F("Patient",PATIENT.name,{req:1}),F("Partner",PARTNER.name),F("Cycle Doctor","Dr M. Osei",{req:1}),F("Cycle Nurse","R. Nolan"),F("Patient RX Group","Group A",{req:1})]},
+    {name:"Clinic & Dates",fields:[F("Managing Clinic","OX.ar City (DEMO)"),F("LH Surge","24 Jul 2026",{mono:1}),F("Expected Insemination","25 Jul 2026",{mono:1})]},
+    {name:"Infertility Diagnosis",fields:[F("Female Diagnosis","Unexplained"),F("Male Diagnosis","Normal parameters")]},
+    {name:"Plan",fields:[F("Event Template","IUI"),F("Sperm Source","Partner (prepared)"),F("Prepared Motile Count","18 M/mL"),F("Trigger","hCG")]}
+  ]},
+
+"Ovulation Induction":{purpose:"Drug-induced ovulation + timed intercourse (monitoring only, no lab procedure).",
+  usesPartner:false,
+  steps:["Consent","OI Drugs","Folliculogram","Trigger","Timed Intercourse","Outcome"],
+  tabsHide:["Oocyte Retrieval","Embryo Transfer","IUI/DI","Gametes","Lab Results","Stored Sample"],
+  sections:[
+    {name:"Cycle Information",fields:[F("Treatment Name","Ovulation Induction — Letrozole",{req:1}),F("Treatment Type","Ovulation Induction",{req:1,mono:1}),F("Cycle Sequence No","CY-1188",{mono:1}),F("Billing Option","Self-funded",{req:1}),F("Treatment Template","Ovulation Induction")]},
+    {name:"People",fields:[F("Patient",PATIENT.name,{req:1}),F("Cycle Doctor","Dr M. Osei",{req:1}),F("Cycle Nurse","R. Nolan")]},
+    {name:"Clinic & Dates",fields:[F("Managing Clinic","OX.ar City (DEMO)"),F("Baseline Scan","14 Jul 2026",{mono:1}),F("Day-10 Scan","24 Jul 2026",{mono:1})]},
+    {name:"Infertility Diagnosis",fields:[F("Female Diagnosis","PCOS — anovulation")]},
+    {name:"Plan",fields:[F("Drug","Letrozole 5 mg (days 3–7)"),F("Monitoring","Serial follicle scans"),F("Trigger","hCG when lead follicle ≥ 18 mm")]}
+  ]},
+
+"Tracking":{purpose:"Cycle monitoring / scan tracking only (no procedure).",
+  usesPartner:false,
+  steps:["Folliculogram Tracking","LH & Trigger Monitoring","Outcome / Hand-off"],
+  tabsHide:["Oocyte Retrieval","Embryo Transfer","IUI/DI","Gametes","Lab Results","Stored Sample","Checklists"],
+  sections:[
+    {name:"Cycle Information",fields:[F("Treatment Name","Cycle Tracking",{req:1}),F("Treatment Type","Tracking",{req:1,mono:1}),F("Cycle Sequence No","CY-1189",{mono:1}),F("Treatment Template","Cycle Tracking")]},
+    {name:"People",fields:[F("Patient",PATIENT.name,{req:1}),F("Cycle Doctor","Dr M. Osei"),F("Cycle Nurse","R. Nolan")]},
+    {name:"Clinic & Dates",fields:[F("Managing Clinic","OX.ar City (DEMO)"),F("Period Started","10 Jul 2026",{mono:1}),F("Actual Period Date","10 Jul 2026",{mono:1})]},
+    {name:"Plan",fields:[F("Monitoring","Serial scans + LH"),F("Hand-off","to IUI / IVF if indicated")]}
+  ]},
+
+"Thaw and Refreeze":{purpose:"Retrieve a stored specimen → thaw → (± biopsy) → refreeze → storage.",
+  usesPartner:true,
+  steps:["Consent & 3PC","Select Specimen","Thaw","Assess (± Biopsy)","Refreeze","Storage","Witnessing"],
+  tabsHide:["Folliculogram","Drugs","Oocyte Retrieval","Embryo Transfer","IUI/DI","Lab Results","Outcome Data"],
+  sections:[
+    {name:"Cycle Information",fields:[F("Treatment Name","Thaw & Refreeze — PGT",{req:1}),F("Treatment Type","Thaw and Refreeze",{req:1,mono:1}),F("Cycle Sequence No","CY-1190",{mono:1}),F("Treatment Template","Thaw and Refreeze")]},
+    {name:"People",fields:[F("Patient",PATIENT.name,{req:1}),F("Partner",PARTNER.name),F("Embryologist","A. Kaur",{req:1}),F("Witness","R. Nolan",{req:1})]},
+    {name:"Specimen & Storage",fields:[F("Specimen","EMB-1043 · Blast 3BB",{mono:1}),F("Reason","Biopsy for PGT-A"),F("Refreeze Method","Vitrification"),F("Storage Location","TANK-01 · C1 · G2 · S5",{mono:1})]}
+  ]},
+};
+
+/* ---------- render ---------- */
 const typebar = document.getElementById('typebar');
-Object.keys(TYPES).forEach((t,i)=>{
+Object.keys(TEMPLATES).forEach((t,i)=>{
   const b=document.createElement('button'); b.className='typebtn'+(i===0?' active':''); b.textContent=t; b.dataset.type=t;
   b.onclick=()=>selectType(t); typebar.appendChild(b);
 });
 
 function selectType(t){
   document.querySelectorAll('.typebtn').forEach(b=>b.classList.toggle('active',b.dataset.type===t));
-  document.getElementById('typeEcho').textContent=t;
-  const cfg=TYPES[t];
-  // steps
-  const steps=document.getElementById('steps'); steps.innerHTML='';
-  cfg.steps.forEach(s=>{const e=document.createElement('span');e.className='step';e.textContent=s;steps.appendChild(e);});
-  // tabs
+  const tpl=TEMPLATES[t];
+
+  // test couple banner
+  const couple=document.getElementById('couple');
+  couple.innerHTML =
+    '<div class="person p1"><div class="av">'+PATIENT.init+'</div><div><div class="rol">'+PATIENT.role+'</div><div class="nm">'+PATIENT.name+'</div><div class="meta mono">'+PATIENT.meta+'</div></div></div>'+
+    '<div class="person p2'+(tpl.usesPartner?'':' muted')+'"><div class="av">'+PARTNER.init+'</div><div><div class="rol">'+PARTNER.role+(tpl.usesPartner?'':' · not used this cycle')+'</div><div class="nm">'+PARTNER.name+'</div><div class="meta mono">'+PARTNER.meta+'</div></div></div>';
+
+  // dynamic form from the template's sections
+  const form=document.getElementById('planForm'); form.innerHTML='';
+  tpl.sections.forEach(sec=>{
+    const s=document.createElement('div'); s.className='section';
+    let html='<div class="sh">'+sec.name+'</div><div class="fields">';
+    sec.fields.forEach(f=>{
+      html+='<div class="f"><label>'+f.label+(f.req?'<span class="req">*</span>':'')+'</label>'+
+            '<div class="val'+(f.mono?' mono':'')+'">'+f.value+'</div></div>';
+    });
+    html+='</div>'; s.innerHTML=html; form.appendChild(s);
+  });
+
+  // cycle tabs strip
   const strip=document.getElementById('tabstrip'); strip.innerHTML='';
   ALL_TABS.forEach(tab=>{
-    const hidden=cfg.hideTabs.includes(tab);
+    const hidden=tpl.tabsHide.includes(tab);
     const e=document.createElement('span'); e.className='tab '+(hidden?'off':'on')+(tab==='Planning'?' current':'');
     e.textContent=tab; strip.appendChild(e);
   });
-  // fields
-  document.querySelectorAll('[data-f]').forEach(el=>el.classList.remove('hide'));
-  cfg.hideFields.forEach(f=>{const el=document.querySelector('[data-f="'+f+'"]'); if(el) el.classList.add('hide');});
-  // show/hide summary
-  const shownTabs=ALL_TABS.filter(x=>!cfg.hideTabs.includes(x));
-  document.getElementById('showhide').innerHTML =
+
+  // plan steps
+  const steps=document.getElementById('steps'); steps.innerHTML='';
+  tpl.steps.forEach(x=>{const e=document.createElement('span');e.className='step';e.textContent=x;steps.appendChild(e);});
+
+  // shows/hides summary
+  const shownTabs=ALL_TABS.filter(x=>!tpl.tabsHide.includes(x));
+  const fieldCount=tpl.sections.reduce((n,s)=>n+s.fields.length,0);
+  document.getElementById('showhide').innerHTML=
+    '<b>Purpose:</b> '+tpl.purpose+'<br><br>'+
     '<b>Shown tabs:</b> '+shownTabs.join(' · ')+'<br><br>'+
-    (cfg.hideTabs.length?'<b>Hidden:</b> '+cfg.hideTabs.join(' · '):'<b>Hidden:</b> none')+
-    (cfg.hideFields.length?'<br><br><b>Fields hidden:</b> '+cfg.hideFields.length+' (e.g. '+cfg.hideFields.slice(0,3).join(', ')+')':'');
+    (tpl.tabsHide.length?'<b>Hidden tabs:</b> '+tpl.tabsHide.join(' · '):'<b>Hidden tabs:</b> none')+
+    '<br><br><b>Fields shown:</b> '+fieldCount+' across '+tpl.sections.length+' sections'+
+    (tpl.note?'<br><br><b style="color:var(--amber)">⚠ '+tpl.note+'</b>':'');
   document.getElementById('planTitle').textContent='Plan · '+t;
 }
 
