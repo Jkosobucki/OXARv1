@@ -5,46 +5,50 @@ using System.Net;
 using System.Web;
 using System.Web.Http;
 using System.Web.Http.Cors;
-using OXAR.DataTransferObjects.CryoTank;
-using OXAR.Services.CryoTank;
+using OXAR.DataTransferObjects.CryoLocation;
+using OXAR.Services.CryoLocation;
 
 namespace OXAR.Controllers
 {
     /// <summary>
-    /// OX.ar Embryo Module (M-18) — Cryo Tank reference-data API. Full CRUD (manager/admin gated
-    /// for writes) so the lab can add/edit tanks at runtime.
+    /// OX.ar Embryo Module (M-18) — Cryo storage-position API (canister/goblet/straw).
+    /// Full CRUD (manager/admin gated for writes) so the lab can lay out & manage tank contents.
     /// </summary>
     [EnableCors(origins: "*", headers: "*", methods: "*")]
     [Authorize]
-    [RoutePrefix("api/CryoTank")]
-    public class CryoTankController : ApiController
+    [RoutePrefix("api/CryoLocation")]
+    public class CryoLocationController : ApiController
     {
-        private readonly ICryoTankService _service;
+        private readonly ICryoLocationService _service;
         static Logger logger = LogManager.GetCurrentClassLogger();
 
-        private CryoTankController()
+        private CryoLocationController()
         {
-            _service = new CryoTankService();
+            _service = new CryoLocationService();
         }
 
-        [HttpGet, Route("GetBySite")]
-        public IHttpActionResult GetBySite(string siteId = null)
-        {
-            try { return Ok(_service.GetBySite(siteId)); }
-            catch (Exception ex) { return Handle(ex, "GetBySite"); }
-        }
-
-        /// <summary>Frozen specimens stored in a tank (the inventory / "who's in this tank" view).</summary>
-        [HttpGet, Route("GetInventory")]
-        public IHttpActionResult GetInventory(string tankId)
+        [HttpGet, Route("GetByTank")]
+        public IHttpActionResult GetByTank(string tankId)
         {
             try
             {
                 if (string.IsNullOrWhiteSpace(tankId) || !Guid.TryParse(tankId, out _))
                     return BadRequest("tankId must be a valid guid.");
-                return Ok(_service.GetInventory(tankId));
+                return Ok(_service.GetByTank(tankId));
             }
-            catch (Exception ex) { return Handle(ex, "GetInventory"); }
+            catch (Exception ex) { return Handle(ex, "GetByTank"); }
+        }
+
+        [HttpGet, Route("GetAvailableByTank")]
+        public IHttpActionResult GetAvailableByTank(string tankId)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(tankId) || !Guid.TryParse(tankId, out _))
+                    return BadRequest("tankId must be a valid guid.");
+                return Ok(_service.GetAvailableByTank(tankId));
+            }
+            catch (Exception ex) { return Handle(ex, "GetAvailableByTank"); }
         }
 
         [HttpGet, Route("GetById")]
@@ -60,13 +64,12 @@ namespace OXAR.Controllers
         }
 
         [HttpPost, Route("Create")]
-        public IHttpActionResult Post(CryoTankDTO dto)
+        public IHttpActionResult Post(CryoLocationDTO dto)
         {
             try
             {
                 if (dto == null) return BadRequest("Body is required.");
-                if (!IsManager())
-                    return Content(HttpStatusCode.Forbidden, "Only a manager/admin may add a tank.");
+                if (!IsManager()) return Content(HttpStatusCode.Forbidden, "Only a manager/admin may add a location.");
                 var userId = HttpContext.Current.Items["ContactId"] as string;
                 return Ok(_service.Create(dto, userId));
             }
@@ -74,17 +77,24 @@ namespace OXAR.Controllers
         }
 
         [HttpPut, Route("Update")]
-        public IHttpActionResult Put(CryoTankDTO dto)
+        public IHttpActionResult Put(CryoLocationDTO dto)
         {
             try
             {
                 if (dto == null || string.IsNullOrWhiteSpace(dto.Id)) return BadRequest("Id is required.");
-                if (!IsManager())
-                    return Content(HttpStatusCode.Forbidden, "Only a manager/admin may edit a tank.");
+                if (!IsManager()) return Content(HttpStatusCode.Forbidden, "Only a manager/admin may edit a location.");
                 var userId = HttpContext.Current.Items["ContactId"] as string;
                 return Ok(_service.Update(dto, userId));
             }
             catch (Exception ex) { return Handle(ex, "Update"); }
+        }
+
+        /// <summary>Set Occupied/Available/Reserved (used by freeze/thaw allocation).</summary>
+        [HttpPut, Route("SetStatus")]
+        public IHttpActionResult SetStatus(Guid id, int statusValue)
+        {
+            try { return Ok(_service.SetStatus(id, statusValue)); }
+            catch (Exception ex) { return Handle(ex, "SetStatus"); }
         }
 
         [HttpDelete, Route("Delete")]
@@ -92,8 +102,7 @@ namespace OXAR.Controllers
         {
             try
             {
-                if (!IsManager())
-                    return Content(HttpStatusCode.Forbidden, "Only a manager/admin may deactivate a tank.");
+                if (!IsManager()) return Content(HttpStatusCode.Forbidden, "Only a manager/admin may deactivate a location.");
                 return Ok(_service.Delete(id));
             }
             catch (Exception ex) { return Handle(ex, "Delete"); }
@@ -115,7 +124,7 @@ namespace OXAR.Controllers
             string inner = (ex.InnerException != null)
                 ? (ex.InnerException.InnerException != null ? ex.InnerException.InnerException.Message : ex.InnerException.Message)
                 : ex.Message;
-            logger.Error("Type: Error, Location: CryoTankController, Method: " + method + ", Error: " + inner);
+            logger.Error("Type: Error, Location: CryoLocationController, Method: " + method + ", Error: " + inner);
             if (!string.IsNullOrEmpty(inner) && inner.StartsWith("CONFLICT", StringComparison.OrdinalIgnoreCase))
                 return Content(HttpStatusCode.Conflict, inner);
             return BadRequest(inner);

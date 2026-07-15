@@ -588,5 +588,73 @@ for idx, t in enumerate(TYPES):
     text(s, Inches(0.6), Inches(6.8), Inches(12.3), Inches(0.5),
          [[("Fields:  ", 12, DEEP, True, BODY), (t["fields"], 12, MUTED, False, BODY)]])
 
+# ====================================================== SLIDE 24 — PLANNING TAB -> 3PC
+s = prs.slides.add_slide(BLANK); bg(s)
+header(s, "TAB REDESIGN", "Treatment Planning  →  Three-Point Check", 24)
+text(s, Inches(0.6), Inches(1.4), Inches(12.1), Inches(0.8),
+     [[("Plan first, then verify. ", 16, DEEP, True, BODY),
+       ("The Treatment Planning tab consolidates today's Overview; the treatment type then hides "
+        "irrelevant fields. The Three-Point Check gates every procedure.", 16, INK, False, BODY)]])
+# planning card
+box(s, Inches(0.6), Inches(2.5), Inches(7.4), Inches(4.1), fill=WHITE, line=LINE, rounded=True)
+box(s, Inches(0.6), Inches(2.5), Inches(7.4), Inches(0.12), fill=AQUA)
+text(s, Inches(0.85), Inches(2.7), Inches(7.0), Inches(0.4), [[("1 · TREATMENT PLANNING", 13, DEEP, True, HEAD)]])
+plan = [
+    ("Cycle Information", "type, template, billing, ANZARD, instructions"),
+    ("People", "patient, partner, doctor, nurse, groups"),
+    ("Clinic & Dates", "managing/procedure clinic, start & period dates"),
+    ("Diagnosis", "female / male infertility + comment"),
+    ("Plan (new)", "Event Template (seeds worklist) + Research Project"),
+]
+yy = Inches(3.2)
+for t, d in plan:
+    box(s, Inches(0.9), yy + Inches(0.06), Inches(0.14), Inches(0.14), fill=AQUA)
+    text(s, Inches(1.2), yy - Inches(0.04), Inches(6.7), Inches(0.6),
+         [[(t + "  ", 13, INK, True, BODY), (d, 12, MUTED, False, BODY)]])
+    yy += Inches(0.62)
+# 3pc card
+box(s, Inches(8.2), Inches(2.5), Inches(4.7), Inches(4.1), fill=WHITE, line=LINE, rounded=True)
+box(s, Inches(8.2), Inches(2.5), Inches(4.7), Inches(0.12), fill=RED)
+text(s, Inches(8.45), Inches(2.7), Inches(4.2), Inches(0.4), [[("2 · THREE-POINT CHECK", 13, RED, True, HEAD)]])
+tpc = ["Patient verified", "Partner verified", "Consent verified",
+       "Independent witness ≠ performer", "Blocks procedure until Passed"]
+yy = Inches(3.25)
+for it in tpc:
+    c = s.shapes.add_shape(MSO_SHAPE.OVAL, Inches(8.5), yy + Inches(0.02), Inches(0.26), Inches(0.26))
+    c.fill.solid(); c.fill.fore_color.rgb = GREEN; c.line.fill.background(); c.shadow.inherit = False
+    tf = c.text_frame; p = tf.paragraphs[0]; p.alignment = PP_ALIGN.CENTER
+    r = p.add_run(); r.text = "✓"; r.font.size = Pt(10); r.font.bold = True; r.font.color.rgb = WHITE; r.font.name = HEAD
+    text(s, Inches(8.9), yy - Inches(0.03), Inches(3.9), Inches(0.5), [[(it, 12.5, INK, False, BODY)]])
+    yy += Inches(0.6)
+text(s, Inches(0.6), Inches(6.8), Inches(12.3), Inches(0.4),
+     [[("Field-by-field content: OXar_Treatment_Cycle_Tab_Attributes.xlsx + 07-TREATMENT-PLANNING-TAB.md", 11.5, MUTED, False, BODY)]])
+
+# ====================================================== SLIDE 25 — CRYO TANK MANAGEMENT
+s = prs.slides.add_slide(BLANK); bg(s)
+header(s, "CRYO STORAGE", "Managing cryo tanks", 25)
+text(s, Inches(0.6), Inches(1.4), Inches(12.1), Inches(0.7),
+     [[("Three linked screens — see capacity at a glance, drill into the position hierarchy, and "
+        "add / edit tanks and slots (manager-gated).", 16, INK, False, BODY)]])
+cards = [
+    ("TANK WALL", "Card per tank with a fill gauge + status pill (OK / Low N2 / Alarm). + Add tank.", AQUA),
+    ("TANK DETAIL", "Canister -> Goblet -> Straw/Vial tree; slots coloured by status & type; add/edit/retire.", DEEP),
+    ("INVENTORY", "Who's in this tank: patient, specimen ID, material, freeze date, goblet/straw.", PURPLE),
+]
+cw = Inches(3.95); gap = Inches(0.2); x0 = Inches(0.6); y0 = Inches(2.4)
+for i, (t, d, col) in enumerate(cards):
+    x = x0 + i * (cw + gap)
+    box(s, x, y0, cw, Inches(2.4), fill=WHITE, line=LINE, rounded=True)
+    box(s, x, y0, cw, Inches(0.12), fill=col)
+    chip(s, x + Inches(0.3), y0 + Inches(0.35), Inches(2.4), Inches(0.5), t, col, size=13)
+    text(s, x + Inches(0.3), y0 + Inches(1.05), cw - Inches(0.6), Inches(1.2), [[(d, 13, INK, False, BODY)]])
+box(s, Inches(0.6), Inches(5.15), Inches(12.3), Inches(1.55), fill=SOFT, rounded=True)
+text(s, Inches(0.85), Inches(5.28), Inches(11.8), Inches(0.4),
+     [[("Backend (all in the OXAR solution): ", 13, DEEP, True, BODY),
+       ("CryoTank + CryoLocation full CRUD + CryoTank/GetInventory", 13, INK, True, MONO)]])
+text(s, Inches(0.85), Inches(5.75), Inches(11.8), Inches(0.9),
+     [[("Freeze picks a free slot → flips it Occupied; thaw frees it (→ Available), so the tank "
+        "views always reflect live occupancy. Fill gauge: green <80%, amber 80-95%, red ≥95%.",
+        12.5, MUTED, False, BODY)]])
+
 prs.save("/workspace/oxarv1/docs/slides/OXar_Embryo_Module_Idiots_Guide.pptx")
 print("saved", len(prs.slides._sldIdLst), "slides")

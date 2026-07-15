@@ -303,6 +303,68 @@ solution deployment, and the admin UI should say so rather than pretend to edit 
 - Keep all Embryo Module code under `src/lab/` + `src/services/embryoApi.js`. Do not modify
   existing portal components except to add the `/lab` route block in `Layout1.js`.
 
+## 6b. Cryo Tank Management (detailed UI)
+
+Managing cryo tanks properly needs more than a list — the lab must see capacity at a glance, drill
+into the position hierarchy, and add/edit tanks and slots. Build three linked screens under
+`/lab/tank*`, all manager-editable (backend: `CryoTank` + `CryoLocation` CRUD + `CryoTank/GetInventory`).
+
+### Screens
+1. **Tank wall** — `/lab/tank` : a card grid of all tanks for the site. Each card = tank name (mono),
+   a **fill gauge** (`currentUsage / capacity`), and a **status pill** (OK / Low N₂ / Maintenance /
+   Alarm). Colour the gauge green < 80 %, amber 80–95 %, red ≥ 95 %; a non-OK status shows red
+   regardless. A `+ Add tank` button (managers) opens the tank form; each card has Edit / Deactivate.
+2. **Tank detail** — `/lab/tank/:tankId` : the **position hierarchy** Canister → Goblet → Straw/Vial
+   rendered as an expandable tree/grid from `CryoLocation/GetByTank`. Each slot is colour-coded by
+   `storageStatus` (Occupied / Available / Reserved) and by `storageType` (Embryo / Sperm / Oocyte).
+   Managers can `+ Add location`, edit, or retire slots; clicking an occupied slot shows its specimen.
+3. **Inventory** — `/lab/inventory/:tankId` (or a tab on tank detail) : table from
+   `CryoTank/GetInventory` — patient, specimen ID (mono), material type, freeze date, goblet/straw,
+   status. Filter by canister and material type; export.
+
+### Services (add to `embryoApi.js`)
+```js
+export const getTanksBySite   = (siteId) => axios.get(`${url}api/CryoTank/GetBySite?siteId=${siteId}`).then(r=>r.data);
+export const getTank          = (id)     => axios.get(`${url}api/CryoTank/GetById?id=${id}`).then(r=>r.data);
+export const createTank       = (dto)    => axios.post(`${url}api/CryoTank/Create`, dto).then(r=>r.data);
+export const updateTank       = (dto)    => axios.put(`${url}api/CryoTank/Update`, dto).then(r=>r.data);
+export const deactivateTank   = (id)     => axios.delete(`${url}api/CryoTank/Delete?id=${id}`).then(r=>r.data);
+export const getTankInventory = (id)     => axios.get(`${url}api/CryoTank/GetInventory?tankId=${id}`).then(r=>r.data);
+
+export const getLocationsByTank   = (tankId) => axios.get(`${url}api/CryoLocation/GetByTank?tankId=${tankId}`).then(r=>r.data);
+export const getAvailableSlots    = (tankId) => axios.get(`${url}api/CryoLocation/GetAvailableByTank?tankId=${tankId}`).then(r=>r.data);
+export const createLocation       = (dto)    => axios.post(`${url}api/CryoLocation/Create`, dto).then(r=>r.data);
+export const updateLocation       = (dto)    => axios.put(`${url}api/CryoLocation/Update`, dto).then(r=>r.data);
+export const setLocationStatus    = (id, statusValue) => axios.put(`${url}api/CryoLocation/SetStatus?id=${id}&statusValue=${statusValue}`).then(r=>r.data);
+export const deleteLocation       = (id)     => axios.delete(`${url}api/CryoLocation/Delete?id=${id}`).then(r=>r.data);
+```
+
+### Components
+- `TankCard` (gauge + status pill), `TankWall` (grid + Add), `TankForm` (create/edit — name, site,
+  capacity, status), `LocationTree` (canister→goblet→straw expandable), `LocationForm`,
+  `InventoryTable`. All use the create/edit/delete pattern in §5b (concurrency 409, delete-with-reason,
+  role-gated) — writes are manager/admin only.
+
+### Ties to freeze/thaw
+The freeze dialog calls `getAvailableSlots(tankId)` to pick a free slot, then the freeze service
+flips it Occupied (`CryoLocation/SetStatus`) and stamps the specimen; thaw frees it (→ Available).
+So the tank views always reflect live occupancy.
+
+## 6c. Treatment Planning tab → Three-Point Check
+
+The Treatment Cycle is being re-organised so the embryologist plans, then verifies:
+1. **Treatment Planning** (first tab) — consolidates today's Overview cycle info into clear sections
+   (Cycle Information · People · Clinic · Dates · Diagnosis · **Plan**), and adds a Plan section:
+   pick the **Event Template** (seeds the worklist) and optional **Research Project**. The selected
+   **Treatment Type** immediately applies its display template (§treatment-type templates,
+   `06-TREATMENT-TYPE-TEMPLATES.md`) — hiding irrelevant fields/tabs.
+2. **Three-Point Check** (next tab) — the identity/consent gate (`bcrm_threepointcheck`) that must
+   **pass with an independent witness** before any critical procedure. Render the three identifiers
+   with tick/cross and block downstream tabs' actions until passed.
+
+Field-by-field content for both tabs (and every other tab) is in the workbook
+`OXar_Treatment_Cycle_Tab_Attributes.xlsx` and `07-TREATMENT-PLANNING-TAB.md`.
+
 ## 7. Verify each slice
 1. `npm start` (CRA), sign in with a staff account, open `/lab`.
 2. Confirm the screen loads from the live OXAR endpoint (Network tab → `…/api/…`, no mock array).

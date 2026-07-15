@@ -10,6 +10,7 @@ namespace OXAR.Services.CryoTank
     public interface ICryoTankService
     {
         object GetBySite(string siteId);
+        object GetInventory(string tankId);   // frozen specimens stored in this tank
         CryoTankDTO GetById(string id);
         Guid Create(CryoTankDTO dto, string userId);
         bool Update(CryoTankDTO dto, string userId);
