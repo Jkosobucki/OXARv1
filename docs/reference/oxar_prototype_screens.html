@@ -132,6 +132,11 @@ button{font-family:inherit;cursor:pointer}
 .person .meta{font-size:11.5px;color:var(--muted)}
 .person.muted{opacity:.5}
 .person .meta .mono{font-family:var(--mo)}
+/* Field binding caption (dev view) */
+.bind{display:none;font-family:var(--mo);font-size:10px;color:var(--aqua-deep);margin-top:3px;line-height:1.35}
+.show-bind .bind{display:block}
+.bindtoggle{display:inline-flex;align-items:center;gap:8px;font-family:var(--hd);font-weight:600;font-size:12px;color:var(--muted);cursor:pointer;user-select:none}
+.bindtoggle input{accent-color:var(--aqua-deep);width:15px;height:15px}
 
 /* Plan panel */
 .panel h4{font-size:12px;font-family:var(--hd);font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--aqua-deep);margin-bottom:10px}
@@ -257,6 +262,8 @@ tr:last-child td{border-bottom:none}
         </div>
 
         <div class="typebar" id="typebar"></div>
+
+        <label class="bindtoggle" style="margin-bottom:12px"><input type="checkbox" id="bindToggle"> Show field bindings (entity · attribute · type)</label>
 
         <div class="tabstrip" id="tabstrip"></div>
 
@@ -392,6 +399,64 @@ const PARTNER = {role:"Partner", name:"Alex Sample (DEMO)", init:"AS", meta:"NHR
 const ALL_TABS = ["Planning","Folliculogram","Drugs","Oocyte Retrieval","Semen","Lab Results","Embryo Transfer","IUI/DI","Gametes","Stored Sample","Outcome Data","Checklists"];
 const F=(label,value,opt={})=>({label,value,req:!!opt.req,mono:!!opt.mono});
 
+/* Field-binding metadata (mirrors OXar_Treatment_Type_Templates.xlsx / .ui.json): label -> [entity, attribute, dataType] */
+const META={
+ "Treatment Name":["bcrm_treatment_cycle","bcrm_name","Text"],
+ "Treatment Type":["bcrm_treatment_cycle","bcrm_treatmenttype","Choice"],
+ "Cycle Sequence No":["bcrm_treatment_cycle","bcrm_cyclesequencenumber","AutoNumber"],
+ "Billing Option":["bcrm_treatment_cycle","bcrm_treatmentbillingoption","Choice"],
+ "ANZARD Cycle Type":["bcrm_treatment_cycle","bcrm_anzardcycletype","Choice"],
+ "Treatment Template":["bcrm_treatment_cycle","bcrm_treatmenttemplate","Lookup → bcrm_eventtemplate"],
+ "Patient":["bcrm_treatment_cycle","bcrm_patient","Lookup → contact"],
+ "Partner":["bcrm_treatment_cycle","bcrm_partner","Lookup → contact"],
+ "Cycle Doctor":["bcrm_treatment_cycle","bcrm_cycledoctor","Lookup → systemuser"],
+ "Cycle Nurse":["bcrm_treatment_cycle","bcrm_cyclenurse","Lookup → systemuser"],
+ "Patient RX Group":["bcrm_treatment_cycle","bcrm_patientrxgroup","Choice"],
+ "Embryologist":["bcrm_thawevent","bcrm_embryologist","Lookup → systemuser"],
+ "Witness":["bcrm_thawevent","bcrm_witness","Lookup → systemuser"],
+ "Managing Clinic":["bcrm_treatment_cycle","bcrm_managingclinic","Lookup → account"],
+ "Procedure Clinic":["bcrm_treatment_cycle","bcrm_procedureclinic","Lookup → account"],
+ "Expected Start":["bcrm_treatment_cycle","bcrm_expectedstartdate","DateTime"],
+ "First Injection":["bcrm_fertilitytreatment","bcrm_firstinjectiondate","DateTime"],
+ "Expected OPU":["bcrm_treatment_cycle","bcrm_expectedtreatmentdate","DateTime"],
+ "Lining Check":["bcrm_fertilitytreatment","bcrm_liningcheckdate","DateTime"],
+ "Expected Transfer":["bcrm_treatment_cycle","bcrm_expectedtreatmentdate","DateTime"],
+ "Expected Thaw":["bcrm_thawevent","bcrm_scheduledthawdate","DateTime"],
+ "LH Surge":["bcrm_fertilitytreatment","bcrm_lhsurgedate","DateTime"],
+ "Expected Insemination":["bcrm_insemination","bcrm_date","DateTime"],
+ "Baseline Scan":["bcrm_fertilitytreatment","bcrm_dateofbaselinescan","DateTime"],
+ "Day-10 Scan":["bcrm_fertilitytreatment","bcrm_day10scandate","DateTime"],
+ "Period Started":["bcrm_treatment_cycle","bcrm_expecteddateperiodstarted","DateTime"],
+ "Actual Period Date":["bcrm_treatment_cycle","bcrm_actualperioddate","DateTime"],
+ "Female Diagnosis":["bcrm_treatment_cycle","bcrm_treatment_details_diagnosis","Choice"],
+ "Male Diagnosis":["bcrm_treatment_cycle","bcrm_treatment_details_sec_diagnosis","Choice"],
+ "Comment":["bcrm_treatment_cycle","bcrm_treatment_details_other_diagnosis","Multiline"],
+ "Reason":["bcrm_fertilitytreatment","bcrm_treatmentfeatures","Multiline"],
+ "AMH Validated":["bcrm_fertilitytreatment","bcrm_amh_validated","Two Options"],
+ "Event Template":["bcrm_treatment_cycle","bcrm_eventtemplate","Lookup → bcrm_eventtemplate"],
+ "Research Project":["bcrm_treatment_cycle","bcrm_researchproject","Lookup → bcrm_researchproject"],
+ "Sperm Source":["bcrm_fertilitytreatment","bcrm_spermsource","Choice"],
+ "Insemination Method":["bcrm_insemination","bcrm_method","Choice"],
+ "No. Embryos to Replace":["bcrm_fertilitytreatment","bcrm_no_of_embryos_to_be_replaced","Whole Number"],
+ "Freeze Method":["bcrm_freezeevent","bcrm_freezemethod","Choice"],
+ "Target eggs to store":["bcrm_treatment_cycle","bcrm_targeteggstostore","Text"],
+ "Endometrial Prep":["bcrm_fertilitytreatment","bcrm_endometrialprep","Choice"],
+ "Selected Embryo":["bcrm_embryotransfer","bcrm_embryo","Lookup → bcrm_egg"],
+ "Frozen Oocytes to Thaw":["bcrm_thawevent","bcrm_materialrecord","Lookup → bcrm_egg"],
+ "Prepared Motile Count":["bcrm_semenprep","bcrm_count","Decimal"],
+ "Trigger":["bcrm_fertilitytreatment","bcrm_timeoftrigger","DateTime"],
+ "Drug":["AppointmentDosage","bcrm_drug","Lookup / Text"],
+ "Monitoring":["bcrm_fertilitytreatment","bcrm_folliculogram_comments","Multiline"],
+ "Hand-off":["bcrm_treatment_cycle","bcrm_handoffnote","Multiline"],
+ "Specimen":["bcrm_egg","bcrm_eggs_id","Lookup → bcrm_egg"],
+ "Refreeze Method":["bcrm_freezeevent","bcrm_freezemethod","Choice"],
+ "Storage Location":["bcrm_cryolocation","bcrm_cryolocationid","Lookup → bcrm_cryolocation"]
+};
+function bindCaption(label){
+  const m=META[label]; if(!m) return '<div class="bind">(confirm binding)</div>';
+  return '<div class="bind">'+m[0]+' · '+m[1]+' · '+m[2]+'</div>';
+}
+
 const TEMPLATES = {
 "IVF":{purpose:"Full stimulated cycle — collect eggs, fertilise, transfer / freeze.",
   usesPartner:true,
@@ -509,7 +574,7 @@ function selectType(t){
     let html='<div class="sh">'+sec.name+'</div><div class="fields">';
     sec.fields.forEach(f=>{
       html+='<div class="f"><label>'+f.label+(f.req?'<span class="req">*</span>':'')+'</label>'+
-            '<div class="val'+(f.mono?' mono':'')+'">'+f.value+'</div></div>';
+            '<div class="val'+(f.mono?' mono':'')+'">'+f.value+'</div>'+bindCaption(f.label)+'</div>';
     });
     html+='</div>'; s.innerHTML=html; form.appendChild(s);
   });
@@ -657,6 +722,11 @@ INV.forEach(r=>{
   tr.innerHTML='<td class="mono">'+r[0]+'</td><td>'+r[1]+'</td><td>'+r[2]+'</td><td class="mono">'+r[3]+
     '</td><td class="mono">'+r[4]+'</td><td class="mono">'+r[5]+'</td><td><span class="badge '+r[6]+'"><span class="d"></span>'+r[7]+'</span></td>';
   invBody.appendChild(tr);
+});
+
+/* field-binding dev toggle */
+document.getElementById('bindToggle').addEventListener('change',e=>{
+  document.body.classList.toggle('show-bind', e.target.checked);
 });
 
 /* init */
