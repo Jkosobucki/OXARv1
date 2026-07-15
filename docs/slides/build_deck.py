@@ -422,22 +422,171 @@ for d in done:
     y += Inches(0.7)
 # right column — docs
 box(s, Inches(8.0), Inches(1.5), Inches(4.7), Inches(4.9), fill=INK, rounded=True)
-text(s, Inches(8.3), Inches(1.7), Inches(4.2), Inches(0.5), [[("The full guide (5 docs)", 15, AQUA, True, HEAD)]])
-docs = [
-    ("README.md", "master guide"),
-    ("03-FRONTEND-GUIDE.md", "React build steps"),
-    ("01-DATA-MODEL.md", "entities & fields"),
-    ("02-API-GUIDE.md", "endpoints & code"),
-    ("04-CRUD-AND-EDITING.md", "add / edit / delete + admin"),
+text(s, Inches(8.3), Inches(1.7), Inches(4.2), Inches(0.5), [[("What's in the repo", 15, AQUA, True, HEAD)]])
+items = [
+    ("docs/", "README + 01-06: data model, API, frontend, CRUD, code-drop, treatment-type templates"),
+    ("backend/", "working C#: EmbryoEvent, Opu, CryoTank"),
+    ("docs/templates/", "treatment-type-display-templates.json"),
+    ("docs/slides/", "this deck + generator"),
 ]
-y = Inches(2.25)
-for f, d in docs:
-    text(s, Inches(8.3), y, Inches(4.2), Inches(0.55),
-         [[(f, 12, WHITE, True, MONO)], [(d, 11, RGBColor(0xcf,0xe6,0xe2), False, BODY)]], space_after=1)
-    y += Inches(0.63)
-text(s, Inches(8.3), Inches(5.55), Inches(4.2), Inches(0.9),
-     [[("In docs/embryo-module/ on branch", 11, MUTED, False, BODY)],
-      [("claude/oxar-embryo-module-prototype-tks4fi", 10.5, AQUA, False, MONO)]], space_after=2)
+y = Inches(2.35)
+for f, d in items:
+    text(s, Inches(8.3), y, Inches(4.2), Inches(0.75),
+         [[(f, 12.5, WHITE, True, MONO)], [(d, 10.5, RGBColor(0xcf,0xe6,0xe2), False, BODY)]], space_after=1)
+    y += Inches(0.82)
+text(s, Inches(8.3), Inches(5.9), Inches(4.2), Inches(0.6),
+     [[("github.com/Jkosobucki/OXARv1", 10.5, AQUA, False, MONO)]], space_after=2)
 
-prs.save("/home/user/OxArFrontendReact/docs/embryo-module/OXar_Embryo_Module_Idiots_Guide.pptx")
-print("saved")
+# ====================================================== SLIDE 14 — TEMPLATES CONCEPT
+s = prs.slides.add_slide(BLANK); bg(s)
+header(s, "SHOW ONLY WHAT MATTERS", "One template per treatment type", 14)
+text(s, Inches(0.6), Inches(1.4), Inches(12.1), Inches(1.0),
+     [[("Today every cycle shows every tab and field. Instead, the ", 16, INK, False, BODY),
+       ("treatment type", 16, DEEP, True, BODY),
+       (" (with the patient) drives a template that ", 16, INK, False, BODY),
+       ("hides what's irrelevant and surfaces the right steps", 16, DEEP, True, BODY),
+       (" — faster, safer data entry for the embryologist.", 16, INK, False, BODY)]])
+how = [
+    ("Pick patient + treatment type", " on the Treatment Cycle."),
+    ("Template loads", " — hides the tabs/fields that don't apply, shows the ones that do."),
+    ("Lab steps seed automatically", " — the worklist lists the right procedures for that type."),
+    ("Managers can tune templates", " in the admin screen (reference data, not hard-coded)."),
+]
+bullet(s, Inches(0.7), Inches(2.7), Inches(12), how, gap=0.62, size=15)
+chip(s, Inches(0.7), Inches(5.5), Inches(11.9), Inches(0.7),
+     "Reuses the Event Template design (bcrm_eventtemplate keyed by treatment type)", SOFT, DEEP, size=13.5)
+text(s, Inches(0.7), Inches(6.45), Inches(12), Inches(0.5),
+     [[("8 treatment types: IVF · Egg Only · Embryo Transfer · VOT · IUI · Ovulation Induction · Tracking · Thaw & Refreeze",
+        12.5, MUTED, False, BODY)]])
+
+# ====================================================== SLIDE 15 — MATRIX
+s = prs.slides.add_slide(BLANK); bg(s)
+header(s, "AT A GLANCE", "Key lab steps by treatment type", 15)
+cols = ["IVF", "Egg", "FET", "VOT", "IUI", "OI", "Trk", "T+R"]
+rows = [
+    ("Consent & 3-Point Check", ["Y","Y","Y","Y","Y","Y","-","Y"]),
+    ("Ovarian Stimulation (Drugs)", ["Y","Y","-","-","~","Y","-","-"]),
+    ("Folliculogram monitoring", ["Y","Y","~","-","Y","Y","Y","-"]),
+    ("OPU (Egg Collection)", ["Y","Y","-","-","-","-","-","-"]),
+    ("Oocyte Thaw", ["-","-","-","Y","-","-","-","Y"]),
+    ("Semen Prep", ["Y","-","-","Y","Y","-","-","-"]),
+    ("Insemination (IVF/ICSI)", ["Y","-","-","Y","-","-","-","-"]),
+    ("IUI insemination", ["-","-","-","-","Y","-","-","-"]),
+    ("Fertilisation + Culture", ["Y","-","-","Y","-","-","-","-"]),
+    ("Embryo Thaw", ["~","-","Y","-","-","-","-","~"]),
+    ("Embryo Transfer", ["Y","-","Y","Y","-","-","-","-"]),
+    ("Freeze / Store", ["Y","Y","-","~","-","-","-","Y"]),
+    ("Outcome / Preg test", ["Y","-","Y","Y","Y","Y","~","-"]),
+]
+lx = Inches(0.6); lw = Inches(3.3); cw = Inches(1.15); top = Inches(1.55); rh = Inches(0.37)
+for j, c in enumerate(cols):
+    chip(s, lx + lw + j * cw, top, cw - Inches(0.06), Inches(0.34), c, DEEP, size=10)
+for i, (label, vals) in enumerate(rows):
+    yy = top + Inches(0.46) + i * rh
+    if i % 2 == 0:
+        box(s, lx, yy, lw + 8 * cw - Inches(0.06), rh - Inches(0.04), fill=SOFT)
+    text(s, lx + Inches(0.06), yy, lw, rh, [[(label, 10.5, INK, False, BODY)]], anchor=MSO_ANCHOR.MIDDLE)
+    for j, v in enumerate(vals):
+        glyph = {"Y": "✓", "~": "––", "-": "·"}[v]
+        gcol = {"Y": GREEN, "~": AMBER, "-": MUTED}[v]
+        text(s, lx + lw + j * cw, yy, cw, rh, [[(glyph, 12, gcol, True, HEAD)]],
+             align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE)
+text(s, lx, top + Inches(0.46) + len(rows) * rh + Inches(0.05), Inches(12), Inches(0.4),
+     [[("✓ applies      –– sometimes      · not applicable", 11, MUTED, False, BODY)]])
+
+# ====================================================== SLIDES 16-23 — PER TYPE
+def chip_flow(sl, x0, y0, maxx, steps, fill):
+    x = x0; y = y0; lh = Inches(0.36)
+    for st in steps:
+        w = Inches(max(0.95, 0.115 * len(st) + 0.34))
+        if x + w > maxx:
+            x = x0; y += lh + Inches(0.14)
+        chip(sl, x, y, w, lh, st, fill, WHITE, size=10.5)
+        x += w + Inches(0.12)
+    return y + lh
+
+TYPES = [
+    {"name": "IVF", "color": DEEP,
+     "purpose": "Full stimulated cycle — collect eggs, fertilise, transfer / freeze",
+     "steps": ["Consent & 3PC", "Stimulation", "Folliculogram", "Trigger", "OPU", "Semen Prep",
+               "Insemination", "Fertilisation", "Culture D2-7", "Transfer", "Freeze", "Outcome"],
+     "show": ["Overview", "Folliculogram", "Drugs", "Oocyte Retrieval", "Gametes", "Lab Results",
+              "Embryo Transfer", "Stored Sample", "Outcome Data", "Checklists"],
+     "hide": ["IUI/DI"],
+     "fields": "Show partner, diagnosis, sperm source, # embryos to replace"},
+    {"name": "Egg Only", "color": GREEN,
+     "purpose": "Egg freezing / preservation — collect & vitrify (no fertilisation)",
+     "steps": ["Consent & 3PC", "Stimulation", "Folliculogram", "Trigger", "OPU",
+               "Denuding / MII", "Vitrify Oocytes", "Storage"],
+     "show": ["Overview", "Folliculogram", "Drugs", "Oocyte Retrieval", "Gametes", "Stored Sample", "Checklists"],
+     "hide": ["Embryo Transfer", "IUI/DI", "Lab Results", "Recommendation", "Outcome Data"],
+     "fields": "Hide partner, sperm source, # embryos to replace"},
+    {"name": "Embryo Transfer (FET)", "color": PURPLE,
+     "purpose": "Frozen embryo transfer — thaw a stored embryo & transfer",
+     "steps": ["Consent & 3PC", "Endo Prep / Lining", "Select Embryo", "Embryo Thaw", "3PC",
+               "Transfer", "Outcome"],
+     "show": ["Overview", "Folliculogram", "Drugs", "Gametes", "Stored Sample", "Embryo Transfer",
+              "Outcome Data", "Checklists"],
+     "hide": ["Oocyte Retrieval", "IUI/DI", "Lab Results"],
+     "fields": "Show # embryos to replace; hide sperm source & egg-collection fields"},
+    {"name": "VOT  (Vitrified Oocyte Thaw — confirm)", "color": AMBER,
+     "purpose": "Thaw frozen eggs — ICSI — culture — transfer",
+     "steps": ["Consent & 3PC", "Select Frozen Eggs", "Oocyte Thaw", "Survival", "Semen Prep",
+               "ICSI", "Fertilisation", "Culture", "Transfer / Freeze", "Outcome"],
+     "show": ["Overview", "Gametes", "Stored Sample", "Lab Results", "Embryo Transfer", "Drugs",
+              "Outcome Data", "Checklists"],
+     "hide": ["Oocyte Retrieval", "Folliculogram", "IUI/DI"],
+     "fields": "Confirm the acronym with MIVF / SME before wiring"},
+    {"name": "IUI", "color": AQUA,
+     "purpose": "Intrauterine insemination — prepared sperm into uterus (no egg collection)",
+     "steps": ["Consent & 3PC", "OI / Natural", "Folliculogram", "Trigger", "Semen Prep",
+               "IUI Insemination", "Outcome"],
+     "show": ["Overview", "Folliculogram", "Drugs", "IUI/DI", "Gametes", "Outcome Data", "Checklists"],
+     "hide": ["Oocyte Retrieval", "Embryo Transfer", "Lab Results", "Stored Sample"],
+     "fields": "Show partner & sperm source; hide # embryos to replace"},
+    {"name": "Ovulation Induction", "color": MUTED,
+     "purpose": "Drug-induced ovulation + timed intercourse (monitoring only)",
+     "steps": ["Consent", "OI Drugs", "Folliculogram", "Trigger", "Timed Intercourse", "Outcome"],
+     "show": ["Overview", "Drugs", "Folliculogram", "Outcome Data", "Checklists"],
+     "hide": ["Oocyte Retrieval", "Embryo Transfer", "IUI/DI", "Gametes", "Lab Results", "Stored Sample"],
+     "fields": "Mostly monitoring; hide embryo / sperm fields"},
+    {"name": "Tracking", "color": INK,
+     "purpose": "Cycle monitoring / scan tracking only (no procedure)",
+     "steps": ["Folliculogram Tracking", "LH & Trigger Monitoring", "Outcome / Hand-off"],
+     "show": ["Overview", "Folliculogram", "Outcome Data", "Drugs"],
+     "hide": ["Oocyte Retrieval", "Embryo Transfer", "IUI/DI", "Gametes", "Lab Results",
+              "Stored Sample", "Recommendation"],
+     "fields": "Doctor, nurse, period dates only"},
+    {"name": "Thaw and Refreeze", "color": RED,
+     "purpose": "Thaw a stored specimen — (± biopsy) — refreeze — storage",
+     "steps": ["Consent & 3PC", "Select Specimen", "Thaw", "Assess (± Biopsy)", "Refreeze",
+               "Storage", "Witnessing"],
+     "show": ["Overview", "Gametes", "Stored Sample", "Checklists"],
+     "hide": ["Folliculogram", "Drugs", "Oocyte Retrieval", "Embryo Transfer", "IUI/DI",
+              "Lab Results", "Outcome Data"],
+     "fields": "Storage location & consent; hide clinical / stimulation fields"},
+]
+
+for idx, t in enumerate(TYPES):
+    s = prs.slides.add_slide(BLANK); bg(s)
+    header(s, t["name"].upper(), t["purpose"], 16 + idx)
+    text(s, Inches(0.6), Inches(1.35), Inches(4), Inches(0.3), [[("KEY STEPS", 11, DEEP, True, HEAD)]])
+    y2 = chip_flow(s, Inches(0.6), Inches(1.75), Inches(12.9), t["steps"], t["color"])
+    top = y2 + Inches(0.4)
+    ph = Inches(2.3)
+    # SHOW panel
+    box(s, Inches(0.6), top, Inches(6.0), ph, fill=WHITE, line=LINE, rounded=True)
+    box(s, Inches(0.6), top, Inches(0.12), ph, fill=GREEN)
+    text(s, Inches(0.85), top + Inches(0.15), Inches(5.5), Inches(0.4), [[("SHOW THESE TABS", 12, GREEN, True, HEAD)]])
+    text(s, Inches(0.85), top + Inches(0.62), Inches(5.5), Inches(1.5), [[("  ·  ".join(t["show"]), 13, INK, False, BODY)]])
+    # HIDE panel
+    box(s, Inches(6.9), top, Inches(6.0), ph, fill=WHITE, line=LINE, rounded=True)
+    box(s, Inches(6.9), top, Inches(0.12), ph, fill=RED)
+    text(s, Inches(7.15), top + Inches(0.15), Inches(5.5), Inches(0.4), [[("HIDE THESE TABS", 12, RED, True, HEAD)]])
+    text(s, Inches(7.15), top + Inches(0.62), Inches(5.5), Inches(1.5), [[("  ·  ".join(t["hide"]), 13, INK, False, BODY)]])
+    # fields footer
+    text(s, Inches(0.6), Inches(6.8), Inches(12.3), Inches(0.5),
+         [[("Fields:  ", 12, DEEP, True, BODY), (t["fields"], 12, MUTED, False, BODY)]])
+
+prs.save("/workspace/oxarv1/docs/slides/OXar_Embryo_Module_Idiots_Guide.pptx")
+print("saved", len(prs.slides._sldIdLst), "slides")

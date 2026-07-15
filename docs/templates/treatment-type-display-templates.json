@@ -1,0 +1,150 @@
+{
+  "version": "1.0",
+  "entity": "bcrm_treatment_cycle",
+  "typeField": "bcrm_treatmenttype",
+  "note": "Frontend-consumable config that drives which tabs/fields show on the Treatment Cycle form per treatment type, and the lab event sequence to seed. Confirm optionsetValue integers against the live bcrm_treatmenttype choice and the exact field logical names before wiring. Field names below use the Treatment Cycle form labels.",
+  "alwaysShowFields": [
+    "Treatment Name", "Treatment Type", "Cycle Sequence Number", "Patient",
+    "Cycle Doctor", "Managing Clinic", "Treatment Billing Option", "Patient RX Group",
+    "Expected Start Date"
+  ],
+  "templates": [
+    {
+      "treatmentType": "IVF",
+      "optionsetValue": null,
+      "eventTemplate": "IVF Standard",
+      "steps": [
+        "Consent & 3-Point Check", "Ovarian Stimulation", "Folliculogram Monitoring", "Trigger",
+        "OPU (Egg Collection)", "Semen Prep", "Insemination (IVF/ICSI)", "Fertilisation Check",
+        "Embryo Culture Day 2-7", "Embryo Transfer (Fresh)", "Freeze Surplus", "Outcome"
+      ],
+      "tabs": {
+        "show": ["Overview", "Folliculogram", "Drugs", "Oocyte Retrieval", "Gametes", "Lab Results", "Embryo Transfer", "Stored Sample", "Recommendation", "Outcome Data", "Checklists", "General Information"],
+        "hide": ["IUI/DI"]
+      },
+      "fields": {
+        "show": ["Partner", "Female infertility Diagnose 1", "Male infertility Diagnose 1", "Anzard Cycle Type", "Procedure Clinic", "Cycle Nurse", "Sperm Source", "No of Embryos to be Replaced", "Expected Treatment Date", "Expected Date Period Started", "Actual Period Date"],
+        "hide": ["Deferred Reason"]
+      }
+    },
+    {
+      "treatmentType": "Egg Only",
+      "optionsetValue": null,
+      "eventTemplate": "Egg Freezing",
+      "steps": [
+        "Consent & 3-Point Check", "Ovarian Stimulation", "Folliculogram Monitoring", "Trigger",
+        "OPU (Egg Collection)", "Denuding / Maturity (MII)", "Vitrify Oocytes (Freeze)", "Storage Allocation"
+      ],
+      "tabs": {
+        "show": ["Overview", "Folliculogram", "Drugs", "Oocyte Retrieval", "Gametes", "Stored Sample", "Checklists"],
+        "hide": ["Embryo Transfer", "IUI/DI", "Lab Results", "Recommendation", "Outcome Data"]
+      },
+      "fields": {
+        "show": ["Anzard Cycle Type", "Procedure Clinic", "Cycle Nurse"],
+        "hide": ["Partner", "Sperm Source", "No of Embryos to be Replaced", "Male infertility Diagnose 1"]
+      }
+    },
+    {
+      "treatmentType": "Embryo Transfer",
+      "optionsetValue": null,
+      "eventTemplate": "FET (Frozen Embryo Transfer)",
+      "steps": [
+        "Consent & 3-Point Check", "Endometrial Prep / Lining Tracking", "Select Embryo",
+        "Embryo Thaw", "3-Point Check", "Embryo Transfer", "Outcome"
+      ],
+      "tabs": {
+        "show": ["Overview", "Folliculogram", "Drugs", "Gametes", "Stored Sample", "Embryo Transfer", "Outcome Data", "Checklists"],
+        "hide": ["Oocyte Retrieval", "IUI/DI", "Lab Results"]
+      },
+      "fields": {
+        "show": ["No of Embryos to be Replaced", "Expected Treatment Date", "Anzard Cycle Type"],
+        "hide": ["Sperm Source"]
+      }
+    },
+    {
+      "treatmentType": "VOT",
+      "optionsetValue": null,
+      "eventTemplate": "Vitrified Oocyte Thaw",
+      "confirmMeaning": "VOT is a site-specific acronym; treated as Vitrified Oocyte Thaw. Confirm with MIVF/SME.",
+      "steps": [
+        "Consent & 3-Point Check", "Select Frozen Oocytes", "Oocyte Thaw", "Survival Assessment",
+        "Semen Prep", "ICSI", "Fertilisation Check", "Embryo Culture Day 2-7", "Transfer / Freeze", "Outcome"
+      ],
+      "tabs": {
+        "show": ["Overview", "Gametes", "Stored Sample", "Lab Results", "Embryo Transfer", "Outcome Data", "Checklists", "Drugs"],
+        "hide": ["Oocyte Retrieval", "Folliculogram", "IUI/DI"]
+      },
+      "fields": {
+        "show": ["Partner", "Sperm Source", "No of Embryos to be Replaced"],
+        "hide": []
+      }
+    },
+    {
+      "treatmentType": "IUI",
+      "optionsetValue": null,
+      "eventTemplate": "IUI",
+      "steps": [
+        "Consent & 3-Point Check", "Ovulation Induction / Natural", "Folliculogram Monitoring",
+        "Trigger", "Semen Prep (Andrology)", "IUI Insemination", "Outcome"
+      ],
+      "tabs": {
+        "show": ["Overview", "Folliculogram", "Drugs", "IUI/DI", "Gametes", "Outcome Data", "Checklists"],
+        "hide": ["Oocyte Retrieval", "Embryo Transfer", "Lab Results", "Stored Sample", "Recommendation"]
+      },
+      "fields": {
+        "show": ["Partner", "Sperm Source", "Male infertility Diagnose 1", "Expected Treatment Date"],
+        "hide": ["No of Embryos to be Replaced"]
+      }
+    },
+    {
+      "treatmentType": "Ovulation Induction",
+      "optionsetValue": null,
+      "eventTemplate": "Ovulation Induction",
+      "steps": [
+        "Consent", "Ovulation Induction (Drugs)", "Folliculogram Monitoring", "Trigger",
+        "Timed Intercourse", "Outcome"
+      ],
+      "tabs": {
+        "show": ["Overview", "Drugs", "Folliculogram", "Outcome Data", "Checklists"],
+        "hide": ["Oocyte Retrieval", "Embryo Transfer", "IUI/DI", "Gametes", "Lab Results", "Stored Sample", "Recommendation"]
+      },
+      "fields": {
+        "show": ["Female infertility Diagnose 1", "Cycle Nurse", "Expected Treatment Date"],
+        "hide": ["Partner", "Sperm Source", "No of Embryos to be Replaced"]
+      }
+    },
+    {
+      "treatmentType": "Tracking",
+      "optionsetValue": null,
+      "eventTemplate": "Cycle Tracking",
+      "steps": [
+        "Folliculogram / Scan Tracking", "LH & Trigger Monitoring", "Outcome / Hand-off"
+      ],
+      "tabs": {
+        "show": ["Overview", "Folliculogram", "Outcome Data", "Drugs"],
+        "hide": ["Oocyte Retrieval", "Embryo Transfer", "IUI/DI", "Gametes", "Lab Results", "Stored Sample", "Recommendation", "Checklists"]
+      },
+      "fields": {
+        "show": ["Cycle Doctor", "Cycle Nurse", "Expected Date Period Started", "Actual Period Date"],
+        "hide": ["Partner", "Sperm Source", "No of Embryos to be Replaced"]
+      }
+    },
+    {
+      "treatmentType": "Thaw and Refreeze",
+      "optionsetValue": null,
+      "eventTemplate": "Thaw and Refreeze",
+      "steps": [
+        "Consent & 3-Point Check", "Select Stored Specimen", "Thaw", "Assessment (+/- Biopsy)",
+        "Refreeze", "Storage Allocation", "Witnessing Log"
+      ],
+      "tabs": {
+        "show": ["Overview", "Gametes", "Stored Sample", "Checklists"],
+        "hide": ["Folliculogram", "Drugs", "Oocyte Retrieval", "Embryo Transfer", "IUI/DI", "Lab Results", "Outcome Data", "Recommendation"]
+      },
+      "fields": {
+        "show": ["Storage Location", "Consent Expires On"],
+        "hide": ["No of Embryos to be Replaced", "Expected Treatment Date", "Sperm Source"]
+      }
+    }
+  ]
+}
