@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OX.ar — Treatment Planning &amp; Cryo Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Lato:wght@300;400;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#221f20; --aqua:#45a59d; --aqua-deep:#2f7d76; --aqua-soft:#eaf5f3; --aqua-line:#cfe6e2;
+  --paper:#f5f8f7; --card:#ffffff; --line:#e4ecea; --muted:#6c7c7a; --muted-2:#8a9997;
+  --green:#2f9e6f; --green-soft:#e7f5ee; --amber:#c9821c; --amber-soft:#fbf1de;
+  --red:#cf4a4a; --red-soft:#fbe9e9; --purple:#7a5cc0; --purple-soft:#efeafb;
+  --slate:#697a78; --slate-soft:#eef2f1;
+  --radius:12px; --radius-sm:8px;
+  --shadow:0 1px 2px rgba(34,31,32,.04),0 6px 20px rgba(34,31,32,.05);
+  --hd:'Montserrat',system-ui,'Segoe UI',sans-serif;
+  --bd:'Lato',system-ui,'Segoe UI',sans-serif;
+  --mo:'JetBrains Mono','SFMono-Regular',Consolas,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{font-family:var(--bd);color:var(--ink);background:var(--paper);font-size:14px;line-height:1.45;-webkit-font-smoothing:antialiased}
+.mono{font-family:var(--mo);font-feature-settings:"tnum" 1}
+h1,h2,h3,h4{font-family:var(--hd);margin:0;color:var(--ink);letter-spacing:-.01em}
+button{font-family:inherit;cursor:pointer}
+::selection{background:var(--aqua-soft)}
+
+.app{display:grid;grid-template-rows:auto auto 1fr;height:100vh;overflow:hidden}
+/* Topbar */
+.topbar{display:flex;align-items:center;gap:18px;padding:0 22px;height:58px;background:var(--card);border-bottom:1px solid var(--line);z-index:20}
+.logo{display:flex;align-items:baseline;font-family:var(--hd);font-weight:800;font-size:22px;letter-spacing:-.02em}
+.logo .dot{color:var(--aqua)} .logo .ar{font-weight:600;font-size:20px}
+.logo-sub{font-family:var(--hd);font-weight:600;font-size:11px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;border-left:1px solid var(--line);padding-left:14px;margin-left:2px}
+.ctx{display:flex;align-items:center;gap:12px;margin-left:6px;padding:6px 14px;background:var(--aqua-soft);border:1px solid var(--aqua-line);border-radius:40px}
+.ctx .avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--aqua),var(--aqua-deep));color:#fff;display:grid;place-items:center;font-family:var(--hd);font-weight:700;font-size:12px}
+.ctx .who b{font-family:var(--hd);font-weight:700;font-size:13px;display:block;line-height:1.15}
+.ctx .who span{font-size:11px;color:var(--muted)}
+.spacer{flex:1}
+.witness-chip{display:flex;align-items:center;gap:10px;padding:6px 12px;border-radius:40px;background:var(--green-soft);border:1px solid #c4e6d4}
+.witness-chip.warn{background:var(--amber-soft);border-color:#eecfa0}
+.witness-chip.bad{background:var(--red-soft);border-color:#f0c3c3}
+.witness-chip .lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:700;font-family:var(--hd)}
+.wpair{display:flex;align-items:center}
+.wdot{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;color:#fff;font-family:var(--hd);font-weight:700;font-size:10px;border:2px solid #fff}
+.wdot.a{background:var(--aqua-deep)} .wdot.b{background:var(--green);margin-left:-8px}
+.witness-chip.bad .wdot.b{background:var(--red)}
+.witness-chip .ok{color:var(--green);font-weight:700;font-size:12px;font-family:var(--hd)}
+.witness-chip.warn .ok{color:var(--amber)} .witness-chip.bad .ok{color:var(--red)}
+
+/* Alert strip */
+.alerts{display:flex;align-items:stretch;background:var(--card);border-bottom:1px solid var(--line);padding:0 22px;height:40px}
+.alert{display:flex;align-items:center;gap:8px;padding:0 16px;font-size:12.5px;border-right:1px solid var(--line)}
+.alert:first-child{padding-left:0}
+.alert .tag{font-family:var(--hd);font-weight:700;font-size:10px;letter-spacing:.05em;text-transform:uppercase;padding:2px 7px;border-radius:5px}
+.alert.ok .tag{background:var(--green-soft);color:var(--green)}
+.alert.warn .tag{background:var(--amber-soft);color:var(--amber)}
+.alert.info .tag{background:var(--purple-soft);color:var(--purple)}
+.alert .dim{color:var(--muted)}
+
+.body{display:grid;grid-template-columns:230px 1fr;overflow:hidden;min-height:0}
+/* Sidebar */
+.side{background:var(--card);border-right:1px solid var(--line);overflow-y:auto;padding:14px 12px}
+.nav-group{margin-bottom:16px}
+.nav-group .gh{font-family:var(--hd);font-weight:700;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted-2);padding:4px 10px 6px}
+.nav-item{display:flex;align-items:center;gap:11px;padding:9px 10px;border-radius:var(--radius-sm);color:var(--ink);font-size:13.5px;cursor:pointer;position:relative;margin-bottom:2px;border:none;background:none;width:100%;text-align:left}
+.nav-item:hover{background:var(--aqua-soft)}
+.nav-item.active{background:var(--aqua-soft);color:var(--aqua-deep);font-weight:700}
+.nav-item.active::before{content:"";position:absolute;left:-12px;top:6px;bottom:6px;width:3px;background:var(--aqua);border-radius:0 3px 3px 0}
+.nav-item .count{margin-left:auto;font-family:var(--mo);font-size:11px;font-weight:600;background:var(--slate-soft);color:var(--muted);padding:1px 7px;border-radius:20px}
+.dotmark{width:16px;height:16px;border-radius:5px;background:var(--aqua-soft);border:1px solid var(--aqua-line);flex-shrink:0}
+
+.main{overflow-y:auto;padding:22px 26px 60px}
+.screen{display:none;animation:fade .25s ease}
+.screen.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.screen,*{animation:none!important}}
+
+.page-head{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:18px;gap:20px;flex-wrap:wrap}
+.eyebrow{font-family:var(--hd);font-weight:700;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--aqua-deep);margin-bottom:4px}
+.page-head h1{font-size:25px;font-weight:800}
+.page-head .sub{color:var(--muted);font-size:13.5px;margin-top:4px}
+.btn{display:inline-flex;align-items:center;gap:7px;padding:9px 16px;border-radius:var(--radius-sm);font-family:var(--hd);font-weight:600;font-size:12.5px;border:1px solid var(--line);background:var(--card);color:var(--ink)}
+.btn:hover{border-color:var(--aqua);color:var(--aqua-deep)}
+.btn.primary{background:var(--aqua-deep);color:#fff;border-color:var(--aqua-deep)}
+.btn.primary:hover{background:var(--aqua)}
+.btn:disabled{opacity:.45;cursor:not-allowed;border-color:var(--line);color:var(--muted);background:var(--card)}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+.card-h{display:flex;align-items:center;justify-content:space-between;padding:13px 18px;border-bottom:1px solid var(--line)}
+.card-h h3{font-size:14px;font-weight:700}
+.card-b{padding:18px}
+.grid2{display:grid;grid-template-columns:1fr 340px;gap:16px;align-items:start}
+@media(max-width:1050px){.grid2{grid-template-columns:1fr}}
+
+/* Type selector */
+.typebar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.typebtn{padding:8px 14px;border-radius:40px;border:1px solid var(--line);background:var(--card);font-family:var(--hd);font-weight:600;font-size:12.5px;color:var(--ink)}
+.typebtn:hover{border-color:var(--aqua)}
+.typebtn.active{background:var(--aqua-deep);color:#fff;border-color:var(--aqua-deep)}
+
+/* Cycle tabs strip */
+.tabstrip{display:flex;flex-wrap:wrap;gap:6px;padding:12px 0 4px;border-bottom:1px solid var(--line);margin-bottom:18px}
+.tab{font-family:var(--hd);font-weight:600;font-size:12px;padding:7px 12px;border-radius:6px 6px 0 0;color:var(--muted);background:transparent;border:1px solid transparent;border-bottom:none}
+.tab.on{color:var(--aqua-deep);background:var(--aqua-soft)}
+.tab.on.current{color:#fff;background:var(--aqua-deep)}
+.tab.off{display:none}
+
+/* Form */
+.section{margin-bottom:18px}
+.section .sh{font-family:var(--hd);font-weight:700;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--slate);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.section .sh::after{content:"";flex:1;height:1px;background:var(--line)}
+.fields{display:grid;grid-template-columns:repeat(2,1fr);gap:12px 18px}
+.f{display:flex;flex-direction:column;gap:4px}
+.f.hide{display:none}
+.f label{font-size:11px;font-weight:700;color:var(--muted);font-family:var(--hd);letter-spacing:.02em}
+.f .val{padding:9px 11px;border:1px solid var(--line);border-radius:var(--radius-sm);background:#fbfdfc;font-size:13px;min-height:37px;display:flex;align-items:center}
+.f .val.mono{font-family:var(--mo)}
+.f .val.ro{background:var(--slate-soft);color:var(--muted)}
+.f .val select{border:none;background:none;font:inherit;color:inherit;width:100%;outline:none}
+.req{color:var(--red);margin-left:3px}
+
+/* Plan panel */
+.panel h4{font-size:12px;font-family:var(--hd);font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--aqua-deep);margin-bottom:10px}
+.steps{display:flex;flex-wrap:wrap;gap:6px}
+.step{font-family:var(--hd);font-weight:600;font-size:11px;padding:5px 10px;border-radius:20px;background:var(--aqua-soft);color:var(--aqua-deep);border:1px solid var(--aqua-line)}
+.hidden-list{font-size:12px;color:var(--muted);line-height:1.7}
+.hidden-list b{color:var(--ink);font-family:var(--hd)}
+
+/* Badges & pills */
+.badge{display:inline-flex;align-items:center;gap:5px;font-family:var(--hd);font-weight:600;font-size:11px;padding:3px 9px;border-radius:20px}
+.badge .d{width:6px;height:6px;border-radius:50%}
+.b-green{background:var(--green-soft);color:var(--green)} .b-green .d{background:var(--green)}
+.b-amber{background:var(--amber-soft);color:var(--amber)} .b-amber .d{background:var(--amber)}
+.b-red{background:var(--red-soft);color:var(--red)} .b-red .d{background:var(--red)}
+.b-slate{background:var(--slate-soft);color:var(--slate)} .b-slate .d{background:var(--slate)}
+.b-purple{background:var(--purple-soft);color:var(--purple)} .b-purple .d{background:var(--purple)}
+
+/* 3PC */
+.checks{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px}
+@media(max-width:760px){.checks{grid-template-columns:1fr}}
+.checkcard{border:1px solid var(--line);border-radius:var(--radius);padding:16px;background:var(--card);cursor:pointer;transition:border-color .15s}
+.checkcard:hover{border-color:var(--aqua)}
+.checkcard.done{border-color:var(--green);background:var(--green-soft)}
+.checkcard .tick{width:28px;height:28px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;color:transparent;font-weight:700;margin-bottom:10px}
+.checkcard.done .tick{background:var(--green);border-color:var(--green);color:#fff}
+.checkcard h4{font-size:14px;margin-bottom:3px}
+.checkcard p{font-size:12px;color:var(--muted);margin:0}
+.who-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.who-row .f .val{background:#fbfdfc}
+.gatebar{display:flex;align-items:center;gap:14px;padding:16px 18px;border-radius:var(--radius);border:1px dashed var(--line)}
+.gatebar.ok{border-color:var(--green);background:var(--green-soft)}
+.gatebar.bad{border-color:var(--amber);background:var(--amber-soft)}
+
+/* Tanks */
+.tankwall{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px}
+.tankcard{border:1px solid var(--line);border-radius:var(--radius);padding:16px;background:var(--card);cursor:pointer;box-shadow:var(--shadow)}
+.tankcard:hover{border-color:var(--aqua)}
+.tankcard .tn{font-family:var(--mo);font-weight:600;font-size:15px;margin-bottom:2px}
+.tankcard .site{font-size:11.5px;color:var(--muted);margin-bottom:12px}
+.gauge{height:10px;border-radius:6px;background:var(--slate-soft);overflow:hidden;margin-bottom:6px}
+.gauge > span{display:block;height:100%;border-radius:6px}
+.tankcard .use{display:flex;justify-content:space-between;font-size:11.5px;color:var(--muted);margin-bottom:12px}
+.tankcard .use b{font-family:var(--mo);color:var(--ink)}
+
+/* Tank detail */
+.canisters{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;margin-top:8px}
+.canister{border:1px solid var(--line);border-radius:var(--radius-sm);padding:12px;background:#fbfdfc}
+.canister .cn{font-family:var(--hd);font-weight:700;font-size:12px;margin-bottom:10px;color:var(--slate)}
+.goblets{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.slot{aspect-ratio:1;border-radius:6px;display:grid;place-items:center;font-family:var(--mo);font-size:10px;cursor:pointer;border:1px solid transparent;color:#fff}
+.slot.occ-embryo{background:var(--aqua-deep)} .slot.occ-oocyte{background:var(--purple)} .slot.occ-sperm{background:var(--slate)}
+.slot.avail{background:var(--card);border-color:var(--line);color:var(--muted-2)}
+.slot.res{background:var(--amber-soft);color:var(--amber);border-color:#eecfa0}
+.slot:hover{outline:2px solid var(--aqua)}
+.legend{display:flex;flex-wrap:wrap;gap:14px;margin:16px 0 4px;font-size:12px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:12px;height:12px;border-radius:3px;display:inline-block}
+
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th{text-align:left;font-family:var(--hd);font-weight:700;font-size:11px;letter-spacing:.03em;text-transform:uppercase;color:var(--muted);padding:9px 12px;border-bottom:1px solid var(--line)}
+td{padding:10px 12px;border-bottom:1px solid var(--line)}
+tr:last-child td{border-bottom:none}
+.tbl-wrap{overflow-x:auto}
+.link{color:var(--aqua-deep);font-family:var(--hd);font-weight:600;font-size:12.5px;background:none;border:none;padding:0;cursor:pointer}
+.proto-note{margin-top:6px;font-size:11px;color:var(--muted-2)}
+.slot-info{margin-top:14px;padding:14px;border:1px solid var(--aqua-line);background:var(--aqua-soft);border-radius:var(--radius-sm);font-size:12.5px;display:none}
+.slot-info.show{display:block}
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- Top bar -->
+  <div class="topbar">
+    <div class="logo"><span>OX</span><span class="dot">.</span><span class="ar">ar</span></div>
+    <div class="logo-sub">Embryology</div>
+    <div class="ctx">
+      <div class="avatar">SP</div>
+      <div class="who"><b>SAMPLE, Priya (DEMO)</b><span class="mono">NHR-0042 · Cycle CY-1183</span></div>
+    </div>
+    <div class="spacer"></div>
+    <div class="witness-chip" id="witnessChip">
+      <span class="lbl">Witness</span>
+      <span class="wpair"><span class="wdot a">AK</span><span class="wdot b">RN</span></span>
+      <span class="ok" id="witnessState">✓ verified</span>
+    </div>
+  </div>
+  <!-- Alerts -->
+  <div class="alerts">
+    <div class="alert warn"><span class="tag">Consent</span><span class="dim">Screening due — check prerequisites</span></div>
+    <div class="alert info"><span class="tag">Research</span><span class="dim">Enrolled: PROTO time-lapse study</span></div>
+    <div class="alert ok"><span class="tag">Cycle</span><span class="dim">Planning</span></div>
+  </div>
+
+  <div class="body">
+    <!-- Sidebar -->
+    <nav class="side">
+      <div class="nav-group">
+        <div class="gh">Planning</div>
+        <button class="nav-item active" data-screen="planning"><span class="dotmark"></span>Treatment Planning</button>
+        <button class="nav-item" data-screen="tpc"><span class="dotmark"></span>Three-Point Check</button>
+      </div>
+      <div class="nav-group">
+        <div class="gh">Cryo Storage</div>
+        <button class="nav-item" data-screen="tanks"><span class="dotmark"></span>Cryo Tanks<span class="count">6</span></button>
+        <button class="nav-item" data-screen="inventory"><span class="dotmark"></span>Inventory</button>
+      </div>
+      <div class="nav-group">
+        <div class="gh">Prototype</div>
+        <button class="nav-item" data-screen="about"><span class="dotmark"></span>About this demo</button>
+      </div>
+    </nav>
+
+    <main class="main">
+      <!-- ============ TREATMENT PLANNING ============ -->
+      <section class="screen active" id="planning">
+        <div class="page-head">
+          <div>
+            <div class="eyebrow">Treatment Cycle · CY-1183</div>
+            <h1>Treatment Planning</h1>
+            <div class="sub">Pick the treatment type — the form and tabs adapt to show only what matters.</div>
+          </div>
+          <div><button class="btn">Cancel</button> <button class="btn primary">Save &amp; continue →</button></div>
+        </div>
+
+        <div class="typebar" id="typebar"></div>
+
+        <div class="tabstrip" id="tabstrip"></div>
+
+        <div class="grid2">
+          <div class="card"><div class="card-b">
+            <div class="section">
+              <div class="sh">Cycle Information</div>
+              <div class="fields">
+                <div class="f" data-f="name"><label>Treatment Name<span class="req">*</span></label><div class="val">IVF — Long protocol (DEMO)</div></div>
+                <div class="f" data-f="type"><label>Treatment Type<span class="req">*</span></label><div class="val mono" id="typeEcho">IVF</div></div>
+                <div class="f" data-f="seq"><label>Cycle Sequence Number</label><div class="val mono ro">CY-1183</div></div>
+                <div class="f" data-f="billing"><label>Treatment Billing Option<span class="req">*</span></label><div class="val">Self-funded</div></div>
+                <div class="f" data-f="anzard"><label>ANZARD Cycle Type</label><div class="val">Stimulated — fresh</div></div>
+                <div class="f" data-f="template"><label>Treatment Template</label><div class="val">Standard ICSI, Day 5</div></div>
+              </div>
+            </div>
+            <div class="section">
+              <div class="sh">People</div>
+              <div class="fields">
+                <div class="f" data-f="patient"><label>Patient<span class="req">*</span></label><div class="val">SAMPLE, Priya (DEMO)</div></div>
+                <div class="f" data-f="partner"><label>Partner</label><div class="val">SAMPLE, Alex (DEMO)</div></div>
+                <div class="f" data-f="doctor"><label>Cycle Doctor<span class="req">*</span></label><div class="val">Dr M. Osei</div></div>
+                <div class="f" data-f="nurse"><label>Cycle Nurse</label><div class="val">Nurse R. Nolan</div></div>
+                <div class="f" data-f="rxgroup"><label>Patient RX Group<span class="req">*</span></label><div class="val">Group B</div></div>
+              </div>
+            </div>
+            <div class="section">
+              <div class="sh">Clinic &amp; Dates</div>
+              <div class="fields">
+                <div class="f" data-f="mclinic"><label>Managing Clinic</label><div class="val">OX.ar City (DEMO)</div></div>
+                <div class="f" data-f="pclinic"><label>Procedure Clinic</label><div class="val">OX.ar City Lab</div></div>
+                <div class="f" data-f="startdate"><label>Expected Start Date</label><div class="val mono">14 Jul 2026</div></div>
+                <div class="f" data-f="treatdate"><label>Expected Treatment Date</label><div class="val mono">28 Jul 2026</div></div>
+              </div>
+            </div>
+            <div class="section" data-f="diagnosis">
+              <div class="sh">Infertility Diagnosis</div>
+              <div class="fields">
+                <div class="f" data-f="femdx"><label>Female Infertility Diagnosis</label><div class="val">Tubal factor</div></div>
+                <div class="f" data-f="maledx"><label>Male Infertility Diagnosis</label><div class="val">Mild oligospermia</div></div>
+                <div class="f" data-f="dxcomment"><label>Diagnosis Comment</label><div class="val">—</div></div>
+              </div>
+            </div>
+            <div class="section">
+              <div class="sh">Plan</div>
+              <div class="fields">
+                <div class="f" data-f="eventtpl"><label>Event Template (seeds worklist)</label><div class="val">IVF Standard</div></div>
+                <div class="f" data-f="research"><label>Research Project</label><div class="val">PROTO time-lapse study</div></div>
+                <div class="f" data-f="spermsource"><label>Sperm Source</label><div class="val">Partner (fresh)</div></div>
+                <div class="f" data-f="numembryos"><label>No. of Embryos to Replace</label><div class="val mono">1</div></div>
+              </div>
+            </div>
+          </div></div>
+
+          <div class="card panel"><div class="card-b">
+            <h4 id="planTitle">Plan for this cycle</h4>
+            <div class="steps" id="steps"></div>
+            <div style="height:16px"></div>
+            <h4>What this type shows / hides</h4>
+            <div class="hidden-list" id="showhide"></div>
+            <div style="height:16px"></div>
+            <button class="btn primary" data-screen="tpc" style="width:100%;justify-content:center">Continue to Three-Point Check →</button>
+            <div class="proto-note">Prototype · synthetic data · visibility driven by the treatment-type template.</div>
+          </div></div>
+        </div>
+      </section>
+
+      <!-- ============ THREE-POINT CHECK ============ -->
+      <section class="screen" id="tpc">
+        <div class="page-head">
+          <div>
+            <div class="eyebrow">Safety gate · before every critical step</div>
+            <h1>Three-Point Check</h1>
+            <div class="sub">Verify three identifiers with an independent witness. The procedure stays locked until this passes.</div>
+          </div>
+          <div id="tpcStatus"></div>
+        </div>
+
+        <div class="checks" id="checks">
+          <div class="checkcard" data-check="patient"><div class="tick">✓</div><h4>Patient verified</h4><p>Name + DOB + NHR against the dish label</p></div>
+          <div class="checkcard" data-check="partner"><div class="tick">✓</div><h4>Partner verified</h4><p>Partner identifiers where gametes are used</p></div>
+          <div class="checkcard" data-check="consent"><div class="tick">✓</div><h4>Consent verified</h4><p>Consent &amp; screening current for this step</p></div>
+        </div>
+
+        <div class="card" style="margin-bottom:16px"><div class="card-b">
+          <div class="who-row">
+            <div class="f"><label>Performed by</label><div class="val"><select id="perf"><option>A. Kaur (Embryologist)</option><option>R. Nolan (Embryologist)</option><option>M. Osei (Clinician)</option></select></div></div>
+            <div class="f"><label>Independent witness<span class="req">*</span></label><div class="val"><select id="wit"><option>R. Nolan (Embryologist)</option><option>A. Kaur (Embryologist)</option><option>J. Reyes (Embryologist)</option></select></div></div>
+          </div>
+          <div id="witWarn" class="badge b-red" style="display:none"><span class="d"></span>Witness must be a different person from the performer</div>
+        </div></div>
+
+        <div class="gatebar" id="gatebar">
+          <span id="gateIcon" class="badge b-amber"><span class="d"></span>Pending</span>
+          <span id="gateText" style="flex:1;color:var(--muted)">Tick all three identifiers and pick a different witness to unlock the procedure.</span>
+          <button class="btn primary" id="proceedBtn" disabled>Proceed to Egg Collection →</button>
+        </div>
+      </section>
+
+      <!-- ============ CRYO TANKS ============ -->
+      <section class="screen" id="tanks">
+        <div class="page-head">
+          <div>
+            <div class="eyebrow">Cryo Storage · OX.ar City</div>
+            <h1>Cryo Tanks</h1>
+            <div class="sub">Capacity at a glance. Click a tank to manage canisters, goblets and straws.</div>
+          </div>
+          <div><button class="btn">Filter</button> <button class="btn primary">+ Add tank</button></div>
+        </div>
+        <div class="tankwall" id="tankwall"></div>
+      </section>
+
+      <!-- ============ TANK DETAIL ============ -->
+      <section class="screen" id="tankdetail">
+        <div class="page-head">
+          <div>
+            <div class="eyebrow"><button class="link" data-screen="tanks">← Cryo Tanks</button></div>
+            <h1 id="tdName">Tank</h1>
+            <div class="sub" id="tdSub"></div>
+          </div>
+          <div><button class="btn">+ Add location</button> <button class="btn primary" data-screen="inventory">View inventory →</button></div>
+        </div>
+        <div class="card"><div class="card-h"><h3>Canister → Goblet → Straw</h3>
+          <div class="legend" style="margin:0">
+            <span><i style="background:var(--aqua-deep)"></i>Embryo</span>
+            <span><i style="background:var(--purple)"></i>Oocyte</span>
+            <span><i style="background:var(--slate)"></i>Sperm</span>
+            <span><i style="background:#fff;border:1px solid var(--line)"></i>Available</span>
+            <span><i style="background:var(--amber-soft);border:1px solid #eecfa0"></i>Reserved</span>
+          </div>
+        </div>
+        <div class="card-b">
+          <div class="canisters" id="canisters"></div>
+          <div class="slot-info" id="slotInfo"></div>
+        </div></div>
+      </section>
+
+      <!-- ============ INVENTORY ============ -->
+      <section class="screen" id="inventory">
+        <div class="page-head">
+          <div>
+            <div class="eyebrow">Cryo Storage</div>
+            <h1>Inventory</h1>
+            <div class="sub">Frozen specimens across tanks (synthetic data).</div>
+          </div>
+          <div><button class="btn">Export CSV</button></div>
+        </div>
+        <div class="card"><div class="tbl-wrap"><table>
+          <thead><tr><th>Specimen</th><th>Patient</th><th>Material</th><th>Tank</th><th>Position</th><th>Freeze date</th><th>Status</th></tr></thead>
+          <tbody id="invBody"></tbody>
+        </table></div></div>
+      </section>
+
+      <!-- ============ ABOUT ============ -->
+      <section class="screen" id="about">
+        <div class="page-head"><div><div class="eyebrow">Prototype</div><h1>About this demo</h1></div></div>
+        <div class="card" style="max-width:760px"><div class="card-b">
+          <p>Clickable prototype of the OX.ar Embryo Module enhancements — for showing users, not production. All patients/specimens are synthetic (SAMPLE / DEMO / PROTO).</p>
+          <ul style="line-height:1.9;color:var(--muted)">
+            <li><b style="color:var(--ink)">Treatment Planning</b> — change the treatment type to see fields and cycle tabs show/hide, and the plan steps update. Driven by the per-type templates.</li>
+            <li><b style="color:var(--ink)">Three-Point Check</b> — tick the three identifiers and pick an independent witness to unlock the procedure.</li>
+            <li><b style="color:var(--ink)">Cryo Tanks</b> — fill gauges + status; click a tank for the canister/goblet/straw layout and inventory.</li>
+          </ul>
+          <p class="proto-note">Brand: OX.ar aqua #45a59d · Montserrat / Lato / JetBrains&nbsp;Mono. Independent of OX.gp.</p>
+        </div></div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<script>
+/* ---------- Treatment-type templates (mirrors treatment-type-display-templates.json) ---------- */
+const TYPES = {
+  "IVF":{steps:["Consent & 3PC","Stimulation","Folliculogram","Trigger","OPU","Semen Prep","Insemination","Fertilisation","Culture D2–7","Transfer","Freeze","Outcome"],
+    hideTabs:["IUI/DI"], hideFields:[]},
+  "Egg Only":{steps:["Consent & 3PC","Stimulation","Folliculogram","Trigger","OPU","Denuding / MII","Vitrify Oocytes","Storage"],
+    hideTabs:["Embryo Transfer","IUI/DI","Lab Results","Outcome Data"], hideFields:["partner","spermsource","numembryos","maledx"]},
+  "Embryo Transfer":{steps:["Consent & 3PC","Endo Prep / Lining","Select Embryo","Embryo Thaw","3PC","Transfer","Outcome"],
+    hideTabs:["Oocyte Retrieval","IUI/DI","Lab Results"], hideFields:["spermsource"]},
+  "VOT":{steps:["Consent & 3PC","Select Frozen Eggs","Oocyte Thaw","Survival","Semen Prep","ICSI","Fertilisation","Culture","Transfer / Freeze","Outcome"],
+    hideTabs:["Oocyte Retrieval","Folliculogram","IUI/DI"], hideFields:[]},
+  "IUI":{steps:["Consent & 3PC","OI / Natural","Folliculogram","Trigger","Semen Prep","IUI Insemination","Outcome"],
+    hideTabs:["Oocyte Retrieval","Embryo Transfer","Lab Results","Stored Sample"], hideFields:["numembryos"]},
+  "Ovulation Induction":{steps:["Consent","OI Drugs","Folliculogram","Trigger","Timed Intercourse","Outcome"],
+    hideTabs:["Oocyte Retrieval","Embryo Transfer","IUI/DI","Gametes","Lab Results","Stored Sample"], hideFields:["spermsource","numembryos","partner"]},
+  "Tracking":{steps:["Folliculogram Tracking","LH & Trigger Monitoring","Outcome / Hand-off"],
+    hideTabs:["Oocyte Retrieval","Embryo Transfer","IUI/DI","Gametes","Lab Results","Stored Sample"], hideFields:["partner","spermsource","numembryos","diagnosis"]},
+  "Thaw and Refreeze":{steps:["Consent & 3PC","Select Specimen","Thaw","Assess (± Biopsy)","Refreeze","Storage","Witnessing"],
+    hideTabs:["Folliculogram","Drugs","Oocyte Retrieval","Embryo Transfer","IUI/DI","Lab Results","Outcome Data"], hideFields:["spermsource","numembryos","diagnosis"]}
+};
+const ALL_TABS = ["Planning","Folliculogram","Drugs","Oocyte Retrieval","Semen","Lab Results","Embryo Transfer","IUI/DI","Gametes","Stored Sample","Outcome Data","Checklists"];
+
+const typebar = document.getElementById('typebar');
+Object.keys(TYPES).forEach((t,i)=>{
+  const b=document.createElement('button'); b.className='typebtn'+(i===0?' active':''); b.textContent=t; b.dataset.type=t;
+  b.onclick=()=>selectType(t); typebar.appendChild(b);
+});
+
+function selectType(t){
+  document.querySelectorAll('.typebtn').forEach(b=>b.classList.toggle('active',b.dataset.type===t));
+  document.getElementById('typeEcho').textContent=t;
+  const cfg=TYPES[t];
+  // steps
+  const steps=document.getElementById('steps'); steps.innerHTML='';
+  cfg.steps.forEach(s=>{const e=document.createElement('span');e.className='step';e.textContent=s;steps.appendChild(e);});
+  // tabs
+  const strip=document.getElementById('tabstrip'); strip.innerHTML='';
+  ALL_TABS.forEach(tab=>{
+    const hidden=cfg.hideTabs.includes(tab);
+    const e=document.createElement('span'); e.className='tab '+(hidden?'off':'on')+(tab==='Planning'?' current':'');
+    e.textContent=tab; strip.appendChild(e);
+  });
+  // fields
+  document.querySelectorAll('[data-f]').forEach(el=>el.classList.remove('hide'));
+  cfg.hideFields.forEach(f=>{const el=document.querySelector('[data-f="'+f+'"]'); if(el) el.classList.add('hide');});
+  // show/hide summary
+  const shownTabs=ALL_TABS.filter(x=>!cfg.hideTabs.includes(x));
+  document.getElementById('showhide').innerHTML =
+    '<b>Shown tabs:</b> '+shownTabs.join(' · ')+'<br><br>'+
+    (cfg.hideTabs.length?'<b>Hidden:</b> '+cfg.hideTabs.join(' · '):'<b>Hidden:</b> none')+
+    (cfg.hideFields.length?'<br><br><b>Fields hidden:</b> '+cfg.hideFields.length+' (e.g. '+cfg.hideFields.slice(0,3).join(', ')+')':'');
+  document.getElementById('planTitle').textContent='Plan · '+t;
+}
+
+/* ---------- Screen switching ---------- */
+function go(screen){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('active',s.id===screen));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active',n.dataset.screen===screen));
+  document.querySelector('.main').scrollTop=0;
+}
+document.body.addEventListener('click',e=>{
+  const el=e.target.closest('[data-screen]'); if(el){go(el.dataset.screen);}
+});
+
+/* ---------- Three-point check ---------- */
+const checked={patient:false,partner:false,consent:false};
+document.querySelectorAll('.checkcard').forEach(c=>c.onclick=()=>{
+  const k=c.dataset.check; checked[k]=!checked[k]; c.classList.toggle('done',checked[k]); refreshGate();
+});
+document.getElementById('perf').onchange=refreshGate;
+document.getElementById('wit').onchange=refreshGate;
+function refreshGate(){
+  const all=checked.patient&&checked.partner&&checked.consent;
+  const perf=document.getElementById('perf').value, wit=document.getElementById('wit').value;
+  const diff=perf!==wit;
+  document.getElementById('witWarn').style.display=diff?'none':'inline-flex';
+  // witness chip in top bar
+  const chip=document.getElementById('witnessChip');
+  chip.className='witness-chip '+(diff?'':'bad');
+  document.getElementById('witnessState').textContent=diff?'✓ verified':'same person!';
+  const gate=document.getElementById('gatebar'), icon=document.getElementById('gateIcon'),
+        txt=document.getElementById('gateText'), btn=document.getElementById('proceedBtn'),
+        st=document.getElementById('tpcStatus');
+  if(all&&diff){
+    gate.className='gatebar ok'; icon.className='badge b-green'; icon.innerHTML='<span class="d"></span>Passed';
+    txt.textContent='Identity and consent verified with an independent witness. Procedure unlocked.';
+    btn.disabled=false; st.innerHTML='<span class="badge b-green"><span class="d"></span>Passed</span>';
+  }else{
+    gate.className='gatebar bad'; icon.className='badge b-amber'; icon.innerHTML='<span class="d"></span>'+(diff?'Pending':'Blocked');
+    txt.textContent=diff?'Tick all three identifiers to unlock the procedure.':'Witness cannot be the same person as the performer.';
+    btn.disabled=true; st.innerHTML='<span class="badge b-amber"><span class="d"></span>'+(diff?'Pending':'Blocked')+'</span>';
+  }
+}
+document.getElementById('proceedBtn').onclick=()=>alert('DEMO: 3-point check passed — Egg Collection would open here.');
+
+/* ---------- Cryo tanks ---------- */
+const TANKS=[
+  {id:"TANK-01",site:"City Lab",used:182,cap:200,status:"OK"},
+  {id:"TANK-02",site:"City Lab",used:196,cap:200,status:"Low N₂"},
+  {id:"TANK-03",site:"City Lab",used:74,cap:200,status:"OK"},
+  {id:"TANK-04",site:"North Site",used:200,cap:200,status:"Alarm"},
+  {id:"TANK-05",site:"North Site",used:120,cap:200,status:"OK"},
+  {id:"TANK-06",site:"North Site",used:41,cap:200,status:"Maintenance"}
+];
+function gaugeColor(pct,status){
+  if(status==='Alarm') return 'var(--red)';
+  if(pct>=95) return 'var(--red)'; if(pct>=80) return 'var(--amber)'; return 'var(--green)';
+}
+function statusBadge(s){
+  const m={"OK":"b-green","Low N₂":"b-amber","Alarm":"b-red","Maintenance":"b-slate"};
+  return '<span class="badge '+(m[s]||'b-slate')+'"><span class="d"></span>'+s+'</span>';
+}
+const wall=document.getElementById('tankwall');
+TANKS.forEach(t=>{
+  const pct=Math.round(t.used/t.cap*100);
+  const c=document.createElement('div'); c.className='tankcard'; c.onclick=()=>openTank(t);
+  c.innerHTML='<div class="tn">'+t.id+'</div><div class="site">'+t.site+'</div>'+
+    '<div class="gauge"><span style="width:'+pct+'%;background:'+gaugeColor(pct,t.status)+'"></span></div>'+
+    '<div class="use"><span>Usage</span><span><b>'+t.used+'</b> / '+t.cap+' · '+pct+'%</span></div>'+
+    statusBadge(t.status);
+  wall.appendChild(c);
+});
+
+const TYPESLOT=['embryo','oocyte','sperm'];
+function openTank(t){
+  go('tankdetail');
+  document.getElementById('tdName').textContent=t.id;
+  const pct=Math.round(t.used/t.cap*100);
+  document.getElementById('tdSub').innerHTML=t.site+' · '+t.used+' / '+t.cap+' straws ('+pct+'%) · '+statusBadge(t.status);
+  const wrap=document.getElementById('canisters'); wrap.innerHTML='';
+  document.getElementById('slotInfo').classList.remove('show');
+  // deterministic pseudo layout from tank id
+  let seed=parseInt(t.id.replace(/\D/g,''))||1;
+  const rnd=()=>{seed=(seed*9301+49297)%233280;return seed/233280;};
+  for(let ci=1;ci<=4;ci++){
+    const can=document.createElement('div'); can.className='canister';
+    can.innerHTML='<div class="cn">Canister '+ci+'</div>';
+    const g=document.createElement('div'); g.className='goblets';
+    for(let s=1;s<=12;s++){
+      const r=rnd(); const el=document.createElement('div');
+      let cls,txt=ci+'-'+s,info;
+      if(t.status==='Alarm'||r<0.62){const ty=TYPESLOT[Math.floor(rnd()*3)];cls='occ-'+ty;info='Occupied · '+ty;}
+      else if(r<0.72){cls='res';info='Reserved';}
+      else{cls='avail';info='Available';}
+      el.className='slot '+cls; el.textContent=txt;
+      el.onclick=(ev)=>{ev.stopPropagation();showSlot(t.id,ci,s,info);};
+      g.appendChild(el);
+    }
+    can.appendChild(g); wrap.appendChild(can);
+  }
+}
+function showSlot(tank,c,s,info){
+  const box=document.getElementById('slotInfo'); box.classList.add('show');
+  const occupied=info.startsWith('Occupied');
+  box.innerHTML='<b style="font-family:var(--hd)">'+tank+' · Canister '+c+' · Straw '+s+'</b><br>'+
+    'Status: '+info+ (occupied?' &nbsp;·&nbsp; Specimen <span class="mono">EMB-'+(1000+c*10+s)+'</span> · SAMPLE, Priya (DEMO) · frozen 02 Jun 2026':' &nbsp;·&nbsp; ready for allocation');
+}
+
+/* ---------- Inventory ---------- */
+const INV=[
+  ["EMB-1042","SAMPLE, Priya (DEMO)","Embryo (blast 4AA)","TANK-01","C1 · G2 · S4","02 Jun 2026","b-green","Stored"],
+  ["OO-2210","MODEL, Dana (DEMO)","Oocyte (MII ×6)","TANK-02","C3 · G1 · S9","18 May 2026","b-green","Stored"],
+  ["EMB-1043","SAMPLE, Priya (DEMO)","Embryo (blast 3BB)","TANK-01","C1 · G2 · S5","02 Jun 2026","b-green","Stored"],
+  ["SP-0771","PROTO, Sam (DEMO)","Sperm (2 straws)","TANK-03","C2 · G4 · S2","09 Jan 2026","b-green","Stored"],
+  ["EMB-1101","DEMO, Lena","Embryo (blast 4BB)","TANK-04","C1 · G1 · S1","21 Apr 2026","b-amber","Consent expiring"],
+  ["OO-2255","MODEL, Dana (DEMO)","Oocyte (MII ×4)","TANK-05","C2 · G3 · S7","30 Mar 2026","b-green","Stored"]
+];
+const invBody=document.getElementById('invBody');
+INV.forEach(r=>{
+  const tr=document.createElement('tr');
+  tr.innerHTML='<td class="mono">'+r[0]+'</td><td>'+r[1]+'</td><td>'+r[2]+'</td><td class="mono">'+r[3]+
+    '</td><td class="mono">'+r[4]+'</td><td class="mono">'+r[5]+'</td><td><span class="badge '+r[6]+'"><span class="d"></span>'+r[7]+'</span></td>';
+  invBody.appendChild(tr);
+});
+
+/* init */
+selectType('IVF');
+refreshGate();
+</script>
+</body>
+</html>
