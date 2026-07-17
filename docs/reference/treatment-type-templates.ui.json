@@ -1,0 +1,2170 @@
+{
+  "version": "1.0",
+  "cycleEntity": "bcrm_treatment_cycle",
+  "typeField": "bcrm_treatmenttype",
+  "testCouple": {
+    "patient": "Priya Sample (DEMO) · NHR-0042 · F · DOB 12 Mar 1991",
+    "partner": "Alex Sample (DEMO) · NHR-0043 · M · DOB 04 Aug 1988"
+  },
+  "tabEntities": {
+    "Planning": "bcrm_treatment_cycle",
+    "Folliculogram": "bcrm_fertilitytreatment",
+    "Drugs": "AppointmentDosage",
+    "Oocyte Retrieval": "bcrm_opu",
+    "Semen": "bcrm_semenprep",
+    "Lab Results": "bcrm_eggdetail",
+    "Embryo Transfer": "bcrm_embryotransfer",
+    "IUI/DI": "bcrm_insemination",
+    "Gametes": "bcrm_egg",
+    "Stored Sample": "bcrm_egg / bcrm_cryolocation",
+    "Outcome Data": "bcrm_pregnancy_outcome_details",
+    "Checklists": "bcrm_consentchecklist"
+  },
+  "allTabs": [
+    "Planning",
+    "Folliculogram",
+    "Drugs",
+    "Oocyte Retrieval",
+    "Semen",
+    "Lab Results",
+    "Embryo Transfer",
+    "IUI/DI",
+    "Gametes",
+    "Stored Sample",
+    "Outcome Data",
+    "Checklists"
+  ],
+  "templates": {
+    "IVF": {
+      "purpose": "Full stimulated cycle — collect eggs, fertilise, transfer / freeze.",
+      "usesPartner": true,
+      "note": "",
+      "steps": [
+        "Consent & 3PC",
+        "Stimulation",
+        "Folliculogram",
+        "Trigger",
+        "OPU",
+        "Semen Prep",
+        "Insemination (ICSI)",
+        "Fertilisation",
+        "Culture D2-7",
+        "Transfer",
+        "Freeze surplus",
+        "Outcome"
+      ],
+      "tabs": {
+        "show": [
+          "Planning",
+          "Folliculogram",
+          "Drugs",
+          "Oocyte Retrieval",
+          "Semen",
+          "Lab Results",
+          "Embryo Transfer",
+          "Gametes",
+          "Stored Sample",
+          "Outcome Data",
+          "Checklists"
+        ],
+        "hide": [
+          "IUI/DI"
+        ]
+      },
+      "sections": [
+        {
+          "name": "Cycle Information",
+          "fields": [
+            {
+              "label": "Treatment Name",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_name",
+              "dataType": "Text",
+              "control": "Textbox",
+              "relationship": "—",
+              "required": true,
+              "visible": true,
+              "sampleValue": "IVF — Antagonist protocol",
+              "src": "code"
+            },
+            {
+              "label": "Treatment Type",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_treatmenttype",
+              "dataType": "Choice",
+              "control": "Dropdown",
+              "relationship": "OptionSet: bcrm_treatmenttype",
+              "required": true,
+              "visible": true,
+              "sampleValue": "IVF",
+              "src": "code"
+            },
+            {
+              "label": "Cycle Sequence No",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_cyclesequencenumber",
+              "dataType": "AutoNumber",
+              "control": "Read-only",
+              "relationship": "—",
+              "required": false,
+              "visible": true,
+              "sampleValue": "CY-1183",
+              "src": "form"
+            },
+            {
+              "label": "Billing Option",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_treatmentbillingoption",
+              "dataType": "Choice",
+              "control": "Dropdown",
+              "relationship": "OptionSet",
+              "required": true,
+              "visible": true,
+              "sampleValue": "Self-funded",
+              "src": "form"
+            },
+            {
+              "label": "ANZARD Cycle Type",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_anzardcycletype",
+              "dataType": "Choice",
+              "control": "Dropdown",
+              "relationship": "OptionSet",
+              "required": false,
+              "visible": true,
+              "sampleValue": "Stimulated — fresh",
+              "src": "form"
+            },
+            {
+              "label": "Treatment Template",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_treatmenttemplate",
+              "dataType": "Lookup",
+              "control": "Lookup",
+              "relationship": "N:1 -> bcrm_eventtemplate",
+              "required": false,
+              "visible": true,
+              "sampleValue": "Standard ICSI, Day 5",
+              "src": "new"
+            }
+          ]
+        },
+        {
+          "name": "People",
+          "fields": [
+            {
+              "label": "Patient",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_patient",
+              "dataType": "Lookup",
+              "control": "Lookup",
+              "relationship": "N:1 -> contact",
+              "required": true,
+              "visible": true,
+              "sampleValue": "Priya Sample (DEMO) · NHR-0042 · F · DOB 12 Mar 1991",
+              "src": "code"
+            },
+            {
+              "label": "Partner",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_partner",
+              "dataType": "Lookup",
+              "control": "Lookup",
+              "relationship": "N:1 -> contact",
+              "required": false,
+              "visible": true,
+              "sampleValue": "Alex Sample (DEMO) · NHR-0043 · M · DOB 04 Aug 1988",
+              "src": "code"
+            },
+            {
+              "label": "Cycle Doctor",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_cycledoctor",
+              "dataType": "Lookup",
+              "control": "Lookup",
+              "relationship": "N:1 -> systemuser/bcrm_staff",
+              "required": true,
+              "visible": true,
+              "sampleValue": "Dr M. Osei",
+              "src": "form"
+            },
+            {
+              "label": "Cycle Nurse",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_cyclenurse",
+              "dataType": "Lookup",
+              "control": "Lookup",
+              "relationship": "N:1 -> systemuser/bcrm_staff",
+              "required": false,
+              "visible": true,
+              "sampleValue": "R. Nolan",
+              "src": "form"
+            },
+            {
+              "label": "Patient RX Group",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_patientrxgroup",
+              "dataType": "Choice",
+              "control": "Dropdown",
+              "relationship": "OptionSet",
+              "required": true,
+              "visible": true,
+              "sampleValue": "Group B",
+              "src": "form"
+            }
+          ]
+        },
+        {
+          "name": "Clinic & Dates",
+          "fields": [
+            {
+              "label": "Managing Clinic",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_managingclinic",
+              "dataType": "Lookup",
+              "control": "Lookup",
+              "relationship": "N:1 -> account/bcrm_clinic",
+              "required": false,
+              "visible": true,
+              "sampleValue": "OX.ar City (DEMO)",
+              "src": "form"
+            },
+            {
+              "label": "Procedure Clinic",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_procedureclinic",
+              "dataType": "Lookup",
+              "control": "Lookup",
+              "relationship": "N:1 -> account/bcrm_clinic",
+              "required": false,
+              "visible": true,
+              "sampleValue": "OX.ar City Lab",
+              "src": "form"
+            },
+            {
+              "label": "Expected Start",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_expectedstartdate",
+              "dataType": "DateTime",
+              "control": "Date picker",
+              "relationship": "—",
+              "required": false,
+              "visible": true,
+              "sampleValue": "14 Jul 2026",
+              "src": "form"
+            },
+            {
+              "label": "First Injection",
+              "entity": "bcrm_fertilitytreatment",
+              "attribute": "bcrm_firstinjectiondate",
+              "dataType": "DateTime",
+              "control": "Date picker",
+              "relationship": "1:1 stim detail",
+              "required": false,
+              "visible": true,
+              "sampleValue": "16 Jul 2026",
+              "src": "code"
+            },
+            {
+              "label": "Expected OPU",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_expectedtreatmentdate",
+              "dataType": "DateTime",
+              "control": "Date picker",
+              "relationship": "—",
+              "required": false,
+              "visible": true,
+              "sampleValue": "28 Jul 2026",
+              "src": "form"
+            }
+          ]
+        },
+        {
+          "name": "Infertility Diagnosis",
+          "fields": [
+            {
+              "label": "Female Diagnosis",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_treatment_details_diagnosis",
+              "dataType": "Choice",
+              "control": "Dropdown",
+              "relationship": "OptionSet / Lookup",
+              "required": false,
+              "visible": true,
+              "sampleValue": "Tubal factor",
+              "src": "code"
+            },
+            {
+              "label": "Male Diagnosis",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_treatment_details_sec_diagnosis",
+              "dataType": "Choice",
+              "control": "Dropdown",
+              "relationship": "OptionSet / Lookup",
+              "required": false,
+              "visible": true,
+              "sampleValue": "Mild oligospermia",
+              "src": "code"
+            },
+            {
+              "label": "Comment",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_treatment_details_other_diagnosis",
+              "dataType": "Multiline Text",
+              "control": "Textarea",
+              "relationship": "—",
+              "required": false,
+              "visible": true,
+              "sampleValue": "—",
+              "src": "code"
+            }
+          ]
+        },
+        {
+          "name": "Plan",
+          "fields": [
+            {
+              "label": "Event Template",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_eventtemplate",
+              "dataType": "Lookup",
+              "control": "Lookup",
+              "relationship": "N:1 -> bcrm_eventtemplate (ApplyToCycle seeds events)",
+              "required": false,
+              "visible": true,
+              "sampleValue": "IVF Standard",
+              "src": "new"
+            },
+            {
+              "label": "Research Project",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_researchproject",
+              "dataType": "Lookup",
+              "control": "Lookup",
+              "relationship": "N:1 -> bcrm_researchproject",
+              "required": false,
+              "visible": true,
+              "sampleValue": "PROTO time-lapse study",
+              "src": "new"
+            },
+            {
+              "label": "Sperm Source",
+              "entity": "bcrm_fertilitytreatment",
+              "attribute": "bcrm_spermsource",
+              "dataType": "Choice",
+              "control": "Dropdown",
+              "relationship": "OptionSet",
+              "required": false,
+              "visible": true,
+              "sampleValue": "Partner (fresh)",
+              "src": "code"
+            },
+            {
+              "label": "Insemination Method",
+              "entity": "bcrm_insemination",
+              "attribute": "bcrm_method",
+              "dataType": "Choice",
+              "control": "Dropdown",
+              "relationship": "OptionSet (IVF/ICSI)",
+              "required": false,
+              "visible": true,
+              "sampleValue": "ICSI",
+              "src": "new"
+            },
+            {
+              "label": "No. Embryos to Replace",
+              "entity": "bcrm_fertilitytreatment",
+              "attribute": "bcrm_no_of_embryos_to_be_replaced",
+              "dataType": "Whole Number",
+              "control": "Number",
+              "relationship": "—",
+              "required": false,
+              "visible": true,
+              "sampleValue": "1",
+              "src": "code"
+            }
+          ]
+        }
+      ]
+    },
+    "Egg Only": {
+      "purpose": "Egg freezing / fertility preservation — collect & vitrify oocytes (no fertilisation).",
+      "usesPartner": false,
+      "note": "",
+      "steps": [
+        "Consent & 3PC",
+        "Stimulation",
+        "Folliculogram",
+        "Trigger",
+        "OPU",
+        "Denuding / MII",
+        "Vitrify Oocytes",
+        "Storage"
+      ],
+      "tabs": {
+        "show": [
+          "Planning",
+          "Folliculogram",
+          "Drugs",
+          "Oocyte Retrieval",
+          "Semen",
+          "Gametes",
+          "Stored Sample",
+          "Checklists"
+        ],
+        "hide": [
+          "Embryo Transfer",
+          "IUI/DI",
+          "Lab Results",
+          "Outcome Data"
+        ]
+      },
+      "sections": [
+        {
+          "name": "Cycle Information",
+          "fields": [
+            {
+              "label": "Treatment Name",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_name",
+              "dataType": "Text",
+              "control": "Textbox",
+              "relationship": "—",
+              "required": true,
+              "visible": true,
+              "sampleValue": "Egg Freezing",
+              "src": "code"
+            },
+            {
+              "label": "Treatment Type",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_treatmenttype",
+              "dataType": "Choice",
+              "control": "Dropdown",
+              "relationship": "OptionSet: bcrm_treatmenttype",
+              "required": true,
+              "visible": true,
+              "sampleValue": "Egg Only",
+              "src": "code"
+            },
+            {
+              "label": "Cycle Sequence No",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_cyclesequencenumber",
+              "dataType": "AutoNumber",
+              "control": "Read-only",
+              "relationship": "—",
+              "required": false,
+              "visible": true,
+              "sampleValue": "CY-1184",
+              "src": "form"
+            },
+            {
+              "label": "Billing Option",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_treatmentbillingoption",
+              "dataType": "Choice",
+              "control": "Dropdown",
+              "relationship": "OptionSet",
+              "required": true,
+              "visible": true,
+              "sampleValue": "Self-funded",
+              "src": "form"
+            },
+            {
+              "label": "ANZARD Cycle Type",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_anzardcycletype",
+              "dataType": "Choice",
+              "control": "Dropdown",
+              "relationship": "OptionSet",
+              "required": false,
+              "visible": true,
+              "sampleValue": "Stimulated — freeze all",
+              "src": "form"
+            },
+            {
+              "label": "Treatment Template",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_treatmenttemplate",
+              "dataType": "Lookup",
+              "control": "Lookup",
+              "relationship": "N:1 -> bcrm_eventtemplate",
+              "required": false,
+              "visible": true,
+              "sampleValue": "Egg Freezing",
+              "src": "new"
+            }
+          ]
+        },
+        {
+          "name": "People",
+          "fields": [
+            {
+              "label": "Patient",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_patient",
+              "dataType": "Lookup",
+              "control": "Lookup",
+              "relationship": "N:1 -> contact",
+              "required": true,
+              "visible": true,
+              "sampleValue": "Priya Sample (DEMO) · NHR-0042 · F · DOB 12 Mar 1991",
+              "src": "code"
+            },
+            {
+              "label": "Cycle Doctor",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_cycledoctor",
+              "dataType": "Lookup",
+              "control": "Lookup",
+              "relationship": "N:1 -> systemuser/bcrm_staff",
+              "required": true,
+              "visible": true,
+              "sampleValue": "Dr M. Osei",
+              "src": "form"
+            },
+            {
+              "label": "Cycle Nurse",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_cyclenurse",
+              "dataType": "Lookup",
+              "control": "Lookup",
+              "relationship": "N:1 -> systemuser/bcrm_staff",
+              "required": false,
+              "visible": true,
+              "sampleValue": "R. Nolan",
+              "src": "form"
+            },
+            {
+              "label": "Patient RX Group",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_patientrxgroup",
+              "dataType": "Choice",
+              "control": "Dropdown",
+              "relationship": "OptionSet",
+              "required": true,
+              "visible": true,
+              "sampleValue": "Group B",
+              "src": "form"
+            }
+          ]
+        },
+        {
+          "name": "Clinic & Dates",
+          "fields": [
+            {
+              "label": "Managing Clinic",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_managingclinic",
+              "dataType": "Lookup",
+              "control": "Lookup",
+              "relationship": "N:1 -> account/bcrm_clinic",
+              "required": false,
+              "visible": true,
+              "sampleValue": "OX.ar City (DEMO)",
+              "src": "form"
+            },
+            {
+              "label": "Procedure Clinic",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_procedureclinic",
+              "dataType": "Lookup",
+              "control": "Lookup",
+              "relationship": "N:1 -> account/bcrm_clinic",
+              "required": false,
+              "visible": true,
+              "sampleValue": "OX.ar City Lab",
+              "src": "form"
+            },
+            {
+              "label": "Expected Start",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_expectedstartdate",
+              "dataType": "DateTime",
+              "control": "Date picker",
+              "relationship": "—",
+              "required": false,
+              "visible": true,
+              "sampleValue": "14 Jul 2026",
+              "src": "form"
+            },
+            {
+              "label": "First Injection",
+              "entity": "bcrm_fertilitytreatment",
+              "attribute": "bcrm_firstinjectiondate",
+              "dataType": "DateTime",
+              "control": "Date picker",
+              "relationship": "1:1 stim detail",
+              "required": false,
+              "visible": true,
+              "sampleValue": "16 Jul 2026",
+              "src": "code"
+            },
+            {
+              "label": "Expected OPU",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_expectedtreatmentdate",
+              "dataType": "DateTime",
+              "control": "Date picker",
+              "relationship": "—",
+              "required": false,
+              "visible": true,
+              "sampleValue": "28 Jul 2026",
+              "src": "form"
+            }
+          ]
+        },
+        {
+          "name": "Indication",
+          "fields": [
+            {
+              "label": "Reason",
+              "entity": "bcrm_fertilitytreatment",
+              "attribute": "bcrm_treatmentfeatures",
+              "dataType": "Multiline Text",
+              "control": "Textarea",
+              "relationship": "—",
+              "required": false,
+              "visible": true,
+              "sampleValue": "Elective fertility preservation",
+              "src": "code"
+            },
+            {
+              "label": "AMH Validated",
+              "entity": "bcrm_fertilitytreatment",
+              "attribute": "bcrm_amh_validated",
+              "dataType": "Two Options",
+              "control": "Toggle",
+              "relationship": "—",
+              "required": false,
+              "visible": true,
+              "sampleValue": "Yes — 18.2 pmol/L",
+              "src": "code"
+            }
+          ]
+        },
+        {
+          "name": "Plan",
+          "fields": [
+            {
+              "label": "Event Template",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_eventtemplate",
+              "dataType": "Lookup",
+              "control": "Lookup",
+              "relationship": "N:1 -> bcrm_eventtemplate (ApplyToCycle seeds events)",
+              "required": false,
+              "visible": true,
+              "sampleValue": "Egg Freezing",
+              "src": "new"
+            },
+            {
+              "label": "Research Project",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_researchproject",
+              "dataType": "Lookup",
+              "control": "Lookup",
+              "relationship": "N:1 -> bcrm_researchproject",
+              "required": false,
+              "visible": true,
+              "sampleValue": "—",
+              "src": "new"
+            },
+            {
+              "label": "Freeze Method",
+              "entity": "bcrm_freezeevent",
+              "attribute": "bcrm_freezemethod",
+              "dataType": "Choice",
+              "control": "Dropdown",
+              "relationship": "OptionSet",
+              "required": false,
+              "visible": true,
+              "sampleValue": "Vitrification",
+              "src": "new"
+            },
+            {
+              "label": "Target eggs to store",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_targeteggstostore",
+              "dataType": "Text",
+              "control": "Textbox",
+              "relationship": "—",
+              "required": false,
+              "visible": true,
+              "sampleValue": "≥ 10 MII",
+              "src": "new"
+            }
+          ]
+        }
+      ]
+    },
+    "Embryo Transfer": {
+      "purpose": "Frozen embryo transfer (FET) — thaw a stored embryo and transfer.",
+      "usesPartner": true,
+      "note": "",
+      "steps": [
+        "Consent & 3PC",
+        "Endometrial Prep / Lining",
+        "Select Embryo",
+        "Embryo Thaw",
+        "3PC",
+        "Transfer",
+        "Outcome"
+      ],
+      "tabs": {
+        "show": [
+          "Planning",
+          "Folliculogram",
+          "Drugs",
+          "Semen",
+          "Embryo Transfer",
+          "Gametes",
+          "Stored Sample",
+          "Outcome Data",
+          "Checklists"
+        ],
+        "hide": [
+          "Oocyte Retrieval",
+          "IUI/DI",
+          "Lab Results"
+        ]
+      },
+      "sections": [
+        {
+          "name": "Cycle Information",
+          "fields": [
+            {
+              "label": "Treatment Name",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_name",
+              "dataType": "Text",
+              "control": "Textbox",
+              "relationship": "—",
+              "required": true,
+              "visible": true,
+              "sampleValue": "FET — Medicated",
+              "src": "code"
+            },
+            {
+              "label": "Treatment Type",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_treatmenttype",
+              "dataType": "Choice",
+              "control": "Dropdown",
+              "relationship": "OptionSet: bcrm_treatmenttype",
+              "required": true,
+              "visible": true,
+              "sampleValue": "Embryo Transfer",
+              "src": "code"
+            },
+            {
+              "label": "Cycle Sequence No",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_cyclesequencenumber",
+              "dataType": "AutoNumber",
+              "control": "Read-only",
+              "relationship": "—",
+              "required": false,
+              "visible": true,
+              "sampleValue": "CY-1185",
+              "src": "form"
+            },
+            {
+              "label": "Billing Option",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_treatmentbillingoption",
+              "dataType": "Choice",
+              "control": "Dropdown",
+              "relationship": "OptionSet",
+              "required": true,
+              "visible": true,
+              "sampleValue": "Medicare + gap",
+              "src": "form"
+            },
+            {
+              "label": "ANZARD Cycle Type",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_anzardcycletype",
+              "dataType": "Choice",
+              "control": "Dropdown",
+              "relationship": "OptionSet",
+              "required": false,
+              "visible": true,
+              "sampleValue": "FET",
+              "src": "form"
+            },
+            {
+              "label": "Treatment Template",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_treatmenttemplate",
+              "dataType": "Lookup",
+              "control": "Lookup",
+              "relationship": "N:1 -> bcrm_eventtemplate",
+              "required": false,
+              "visible": true,
+              "sampleValue": "FET (Frozen Embryo Transfer)",
+              "src": "new"
+            }
+          ]
+        },
+        {
+          "name": "People",
+          "fields": [
+            {
+              "label": "Patient",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_patient",
+              "dataType": "Lookup",
+              "control": "Lookup",
+              "relationship": "N:1 -> contact",
+              "required": true,
+              "visible": true,
+              "sampleValue": "Priya Sample (DEMO) · NHR-0042 · F · DOB 12 Mar 1991",
+              "src": "code"
+            },
+            {
+              "label": "Partner",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_partner",
+              "dataType": "Lookup",
+              "control": "Lookup",
+              "relationship": "N:1 -> contact",
+              "required": false,
+              "visible": true,
+              "sampleValue": "Alex Sample (DEMO) · NHR-0043 · M · DOB 04 Aug 1988",
+              "src": "code"
+            },
+            {
+              "label": "Cycle Doctor",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_cycledoctor",
+              "dataType": "Lookup",
+              "control": "Lookup",
+              "relationship": "N:1 -> systemuser/bcrm_staff",
+              "required": true,
+              "visible": true,
+              "sampleValue": "Dr M. Osei",
+              "src": "form"
+            },
+            {
+              "label": "Cycle Nurse",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_cyclenurse",
+              "dataType": "Lookup",
+              "control": "Lookup",
+              "relationship": "N:1 -> systemuser/bcrm_staff",
+              "required": false,
+              "visible": true,
+              "sampleValue": "R. Nolan",
+              "src": "form"
+            },
+            {
+              "label": "Patient RX Group",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_patientrxgroup",
+              "dataType": "Choice",
+              "control": "Dropdown",
+              "relationship": "OptionSet",
+              "required": true,
+              "visible": true,
+              "sampleValue": "Group B",
+              "src": "form"
+            }
+          ]
+        },
+        {
+          "name": "Clinic & Dates",
+          "fields": [
+            {
+              "label": "Managing Clinic",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_managingclinic",
+              "dataType": "Lookup",
+              "control": "Lookup",
+              "relationship": "N:1 -> account/bcrm_clinic",
+              "required": false,
+              "visible": true,
+              "sampleValue": "OX.ar City (DEMO)",
+              "src": "form"
+            },
+            {
+              "label": "Lining Check",
+              "entity": "bcrm_fertilitytreatment",
+              "attribute": "bcrm_liningcheckdate",
+              "dataType": "DateTime",
+              "control": "Date picker",
+              "relationship": "1:1 stim detail",
+              "required": false,
+              "visible": true,
+              "sampleValue": "22 Jul 2026",
+              "src": "new"
+            },
+            {
+              "label": "Expected Transfer",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_expectedtreatmentdate",
+              "dataType": "DateTime",
+              "control": "Date picker",
+              "relationship": "—",
+              "required": false,
+              "visible": true,
+              "sampleValue": "29 Jul 2026",
+              "src": "form"
+            }
+          ]
+        },
+        {
+          "name": "Plan",
+          "fields": [
+            {
+              "label": "Event Template",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_eventtemplate",
+              "dataType": "Lookup",
+              "control": "Lookup",
+              "relationship": "N:1 -> bcrm_eventtemplate (ApplyToCycle seeds events)",
+              "required": false,
+              "visible": true,
+              "sampleValue": "FET",
+              "src": "new"
+            },
+            {
+              "label": "Endometrial Prep",
+              "entity": "bcrm_fertilitytreatment",
+              "attribute": "bcrm_endometrialprep",
+              "dataType": "Choice",
+              "control": "Dropdown",
+              "relationship": "OptionSet (Medicated/Natural)",
+              "required": false,
+              "visible": true,
+              "sampleValue": "Medicated (HRT)",
+              "src": "new"
+            },
+            {
+              "label": "Selected Embryo",
+              "entity": "bcrm_embryotransfer",
+              "attribute": "bcrm_embryo",
+              "dataType": "Lookup",
+              "control": "Lookup",
+              "relationship": "N:1 -> bcrm_egg (embryo)",
+              "required": false,
+              "visible": true,
+              "sampleValue": "EMB-1042 · Blast 4AA · Day 5",
+              "src": "new"
+            },
+            {
+              "label": "No. Embryos to Replace",
+              "entity": "bcrm_fertilitytreatment",
+              "attribute": "bcrm_no_of_embryos_to_be_replaced",
+              "dataType": "Whole Number",
+              "control": "Number",
+              "relationship": "—",
+              "required": false,
+              "visible": true,
+              "sampleValue": "1",
+              "src": "code"
+            }
+          ]
+        }
+      ]
+    },
+    "VOT": {
+      "purpose": "Vitrified Oocyte Thaw — thaw frozen eggs → ICSI → culture → transfer.",
+      "usesPartner": true,
+      "note": "VOT is a site-specific acronym — confirm exact meaning with MIVF/SME.",
+      "steps": [
+        "Consent & 3PC",
+        "Select Frozen Eggs",
+        "Oocyte Thaw",
+        "Survival Check",
+        "Semen Prep",
+        "ICSI",
+        "Fertilisation",
+        "Culture",
+        "Transfer / Freeze",
+        "Outcome"
+      ],
+      "tabs": {
+        "show": [
+          "Planning",
+          "Drugs",
+          "Semen",
+          "Lab Results",
+          "Embryo Transfer",
+          "Gametes",
+          "Stored Sample",
+          "Outcome Data",
+          "Checklists"
+        ],
+        "hide": [
+          "Oocyte Retrieval",
+          "Folliculogram",
+          "IUI/DI"
+        ]
+      },
+      "sections": [
+        {
+          "name": "Cycle Information",
+          "fields": [
+            {
+              "label": "Treatment Name",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_name",
+              "dataType": "Text",
+              "control": "Textbox",
+              "relationship": "—",
+              "required": true,
+              "visible": true,
+              "sampleValue": "VOT — thaw & ICSI",
+              "src": "code"
+            },
+            {
+              "label": "Treatment Type",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_treatmenttype",
+              "dataType": "Choice",
+              "control": "Dropdown",
+              "relationship": "OptionSet: bcrm_treatmenttype",
+              "required": true,
+              "visible": true,
+              "sampleValue": "VOT",
+              "src": "code"
+            },
+            {
+              "label": "Cycle Sequence No",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_cyclesequencenumber",
+              "dataType": "AutoNumber",
+              "control": "Read-only",
+              "relationship": "—",
+              "required": false,
+              "visible": true,
+              "sampleValue": "CY-1186",
+              "src": "form"
+            },
+            {
+              "label": "Billing Option",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_treatmentbillingoption",
+              "dataType": "Choice",
+              "control": "Dropdown",
+              "relationship": "OptionSet",
+              "required": true,
+              "visible": true,
+              "sampleValue": "Self-funded",
+              "src": "form"
+            },
+            {
+              "label": "ANZARD Cycle Type",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_anzardcycletype",
+              "dataType": "Choice",
+              "control": "Dropdown",
+              "relationship": "OptionSet",
+              "required": false,
+              "visible": true,
+              "sampleValue": "Thaw oocytes",
+              "src": "form"
+            },
+            {
+              "label": "Treatment Template",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_treatmenttemplate",
+              "dataType": "Lookup",
+              "control": "Lookup",
+              "relationship": "N:1 -> bcrm_eventtemplate",
+              "required": false,
+              "visible": true,
+              "sampleValue": "Vitrified Oocyte Thaw",
+              "src": "new"
+            }
+          ]
+        },
+        {
+          "name": "People",
+          "fields": [
+            {
+              "label": "Patient",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_patient",
+              "dataType": "Lookup",
+              "control": "Lookup",
+              "relationship": "N:1 -> contact",
+              "required": true,
+              "visible": true,
+              "sampleValue": "Priya Sample (DEMO) · NHR-0042 · F · DOB 12 Mar 1991",
+              "src": "code"
+            },
+            {
+              "label": "Partner",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_partner",
+              "dataType": "Lookup",
+              "control": "Lookup",
+              "relationship": "N:1 -> contact",
+              "required": false,
+              "visible": true,
+              "sampleValue": "Alex Sample (DEMO) · NHR-0043 · M · DOB 04 Aug 1988",
+              "src": "code"
+            },
+            {
+              "label": "Cycle Doctor",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_cycledoctor",
+              "dataType": "Lookup",
+              "control": "Lookup",
+              "relationship": "N:1 -> systemuser/bcrm_staff",
+              "required": true,
+              "visible": true,
+              "sampleValue": "Dr M. Osei",
+              "src": "form"
+            },
+            {
+              "label": "Patient RX Group",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_patientrxgroup",
+              "dataType": "Choice",
+              "control": "Dropdown",
+              "relationship": "OptionSet",
+              "required": true,
+              "visible": true,
+              "sampleValue": "Group B",
+              "src": "form"
+            }
+          ]
+        },
+        {
+          "name": "Clinic & Dates",
+          "fields": [
+            {
+              "label": "Managing Clinic",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_managingclinic",
+              "dataType": "Lookup",
+              "control": "Lookup",
+              "relationship": "N:1 -> account/bcrm_clinic",
+              "required": false,
+              "visible": true,
+              "sampleValue": "OX.ar City (DEMO)",
+              "src": "form"
+            },
+            {
+              "label": "Expected Thaw",
+              "entity": "bcrm_thawevent",
+              "attribute": "bcrm_scheduledthawdate",
+              "dataType": "DateTime",
+              "control": "Date picker",
+              "relationship": "1:N per cycle",
+              "required": false,
+              "visible": true,
+              "sampleValue": "26 Jul 2026",
+              "src": "new"
+            },
+            {
+              "label": "Expected Transfer",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_expectedtreatmentdate",
+              "dataType": "DateTime",
+              "control": "Date picker",
+              "relationship": "—",
+              "required": false,
+              "visible": true,
+              "sampleValue": "31 Jul 2026",
+              "src": "form"
+            }
+          ]
+        },
+        {
+          "name": "Plan",
+          "fields": [
+            {
+              "label": "Event Template",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_eventtemplate",
+              "dataType": "Lookup",
+              "control": "Lookup",
+              "relationship": "N:1 -> bcrm_eventtemplate (ApplyToCycle seeds events)",
+              "required": false,
+              "visible": true,
+              "sampleValue": "VOT",
+              "src": "new"
+            },
+            {
+              "label": "Frozen Oocytes to Thaw",
+              "entity": "bcrm_thawevent",
+              "attribute": "bcrm_materialrecord",
+              "dataType": "Lookup",
+              "control": "Lookup",
+              "relationship": "N:1 -> bcrm_egg (oocyte)",
+              "required": false,
+              "visible": true,
+              "sampleValue": "6 (MII)",
+              "src": "new"
+            },
+            {
+              "label": "Sperm Source",
+              "entity": "bcrm_fertilitytreatment",
+              "attribute": "bcrm_spermsource",
+              "dataType": "Choice",
+              "control": "Dropdown",
+              "relationship": "OptionSet",
+              "required": false,
+              "visible": true,
+              "sampleValue": "Partner (fresh)",
+              "src": "code"
+            },
+            {
+              "label": "Insemination Method",
+              "entity": "bcrm_insemination",
+              "attribute": "bcrm_method",
+              "dataType": "Choice",
+              "control": "Dropdown",
+              "relationship": "OptionSet (IVF/ICSI)",
+              "required": false,
+              "visible": true,
+              "sampleValue": "ICSI",
+              "src": "new"
+            },
+            {
+              "label": "No. Embryos to Replace",
+              "entity": "bcrm_fertilitytreatment",
+              "attribute": "bcrm_no_of_embryos_to_be_replaced",
+              "dataType": "Whole Number",
+              "control": "Number",
+              "relationship": "—",
+              "required": false,
+              "visible": true,
+              "sampleValue": "1",
+              "src": "code"
+            }
+          ]
+        }
+      ]
+    },
+    "IUI": {
+      "purpose": "Intrauterine insemination — prepared sperm placed in the uterus (no egg collection).",
+      "usesPartner": true,
+      "note": "",
+      "steps": [
+        "Consent & 3PC",
+        "OI / Natural",
+        "Folliculogram",
+        "Trigger",
+        "Semen Prep",
+        "IUI Insemination",
+        "Outcome"
+      ],
+      "tabs": {
+        "show": [
+          "Planning",
+          "Folliculogram",
+          "Drugs",
+          "Semen",
+          "IUI/DI",
+          "Gametes",
+          "Outcome Data",
+          "Checklists"
+        ],
+        "hide": [
+          "Oocyte Retrieval",
+          "Embryo Transfer",
+          "Lab Results",
+          "Stored Sample"
+        ]
+      },
+      "sections": [
+        {
+          "name": "Cycle Information",
+          "fields": [
+            {
+              "label": "Treatment Name",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_name",
+              "dataType": "Text",
+              "control": "Textbox",
+              "relationship": "—",
+              "required": true,
+              "visible": true,
+              "sampleValue": "IUI — Natural cycle",
+              "src": "code"
+            },
+            {
+              "label": "Treatment Type",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_treatmenttype",
+              "dataType": "Choice",
+              "control": "Dropdown",
+              "relationship": "OptionSet: bcrm_treatmenttype",
+              "required": true,
+              "visible": true,
+              "sampleValue": "IUI",
+              "src": "code"
+            },
+            {
+              "label": "Cycle Sequence No",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_cyclesequencenumber",
+              "dataType": "AutoNumber",
+              "control": "Read-only",
+              "relationship": "—",
+              "required": false,
+              "visible": true,
+              "sampleValue": "CY-1187",
+              "src": "form"
+            },
+            {
+              "label": "Billing Option",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_treatmentbillingoption",
+              "dataType": "Choice",
+              "control": "Dropdown",
+              "relationship": "OptionSet",
+              "required": true,
+              "visible": true,
+              "sampleValue": "Self-funded",
+              "src": "form"
+            },
+            {
+              "label": "ANZARD Cycle Type",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_anzardcycletype",
+              "dataType": "Choice",
+              "control": "Dropdown",
+              "relationship": "OptionSet",
+              "required": false,
+              "visible": true,
+              "sampleValue": "IUI",
+              "src": "form"
+            },
+            {
+              "label": "Treatment Template",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_treatmenttemplate",
+              "dataType": "Lookup",
+              "control": "Lookup",
+              "relationship": "N:1 -> bcrm_eventtemplate",
+              "required": false,
+              "visible": true,
+              "sampleValue": "IUI",
+              "src": "new"
+            }
+          ]
+        },
+        {
+          "name": "People",
+          "fields": [
+            {
+              "label": "Patient",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_patient",
+              "dataType": "Lookup",
+              "control": "Lookup",
+              "relationship": "N:1 -> contact",
+              "required": true,
+              "visible": true,
+              "sampleValue": "Priya Sample (DEMO) · NHR-0042 · F · DOB 12 Mar 1991",
+              "src": "code"
+            },
+            {
+              "label": "Partner",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_partner",
+              "dataType": "Lookup",
+              "control": "Lookup",
+              "relationship": "N:1 -> contact",
+              "required": false,
+              "visible": true,
+              "sampleValue": "Alex Sample (DEMO) · NHR-0043 · M · DOB 04 Aug 1988",
+              "src": "code"
+            },
+            {
+              "label": "Cycle Doctor",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_cycledoctor",
+              "dataType": "Lookup",
+              "control": "Lookup",
+              "relationship": "N:1 -> systemuser/bcrm_staff",
+              "required": true,
+              "visible": true,
+              "sampleValue": "Dr M. Osei",
+              "src": "form"
+            },
+            {
+              "label": "Cycle Nurse",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_cyclenurse",
+              "dataType": "Lookup",
+              "control": "Lookup",
+              "relationship": "N:1 -> systemuser/bcrm_staff",
+              "required": false,
+              "visible": true,
+              "sampleValue": "R. Nolan",
+              "src": "form"
+            },
+            {
+              "label": "Patient RX Group",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_patientrxgroup",
+              "dataType": "Choice",
+              "control": "Dropdown",
+              "relationship": "OptionSet",
+              "required": true,
+              "visible": true,
+              "sampleValue": "Group A",
+              "src": "form"
+            }
+          ]
+        },
+        {
+          "name": "Clinic & Dates",
+          "fields": [
+            {
+              "label": "Managing Clinic",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_managingclinic",
+              "dataType": "Lookup",
+              "control": "Lookup",
+              "relationship": "N:1 -> account/bcrm_clinic",
+              "required": false,
+              "visible": true,
+              "sampleValue": "OX.ar City (DEMO)",
+              "src": "form"
+            },
+            {
+              "label": "LH Surge",
+              "entity": "bcrm_fertilitytreatment",
+              "attribute": "bcrm_lhsurgedate",
+              "dataType": "DateTime",
+              "control": "Date picker",
+              "relationship": "1:1 stim detail",
+              "required": false,
+              "visible": true,
+              "sampleValue": "24 Jul 2026",
+              "src": "new"
+            },
+            {
+              "label": "Expected Insemination",
+              "entity": "bcrm_insemination",
+              "attribute": "bcrm_date",
+              "dataType": "DateTime",
+              "control": "Date picker",
+              "relationship": "1:N per cycle",
+              "required": false,
+              "visible": true,
+              "sampleValue": "25 Jul 2026",
+              "src": "new"
+            }
+          ]
+        },
+        {
+          "name": "Infertility Diagnosis",
+          "fields": [
+            {
+              "label": "Female Diagnosis",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_treatment_details_diagnosis",
+              "dataType": "Choice",
+              "control": "Dropdown",
+              "relationship": "OptionSet / Lookup",
+              "required": false,
+              "visible": true,
+              "sampleValue": "Unexplained",
+              "src": "code"
+            },
+            {
+              "label": "Male Diagnosis",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_treatment_details_sec_diagnosis",
+              "dataType": "Choice",
+              "control": "Dropdown",
+              "relationship": "OptionSet / Lookup",
+              "required": false,
+              "visible": true,
+              "sampleValue": "Normal parameters",
+              "src": "code"
+            }
+          ]
+        },
+        {
+          "name": "Plan",
+          "fields": [
+            {
+              "label": "Event Template",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_eventtemplate",
+              "dataType": "Lookup",
+              "control": "Lookup",
+              "relationship": "N:1 -> bcrm_eventtemplate (ApplyToCycle seeds events)",
+              "required": false,
+              "visible": true,
+              "sampleValue": "IUI",
+              "src": "new"
+            },
+            {
+              "label": "Sperm Source",
+              "entity": "bcrm_fertilitytreatment",
+              "attribute": "bcrm_spermsource",
+              "dataType": "Choice",
+              "control": "Dropdown",
+              "relationship": "OptionSet",
+              "required": false,
+              "visible": true,
+              "sampleValue": "Partner (prepared)",
+              "src": "code"
+            },
+            {
+              "label": "Prepared Motile Count",
+              "entity": "bcrm_semenprep",
+              "attribute": "bcrm_count",
+              "dataType": "Decimal",
+              "control": "Number",
+              "relationship": "—",
+              "required": false,
+              "visible": true,
+              "sampleValue": "18 M/mL",
+              "src": "new"
+            },
+            {
+              "label": "Trigger",
+              "entity": "bcrm_fertilitytreatment",
+              "attribute": "bcrm_timeoftrigger",
+              "dataType": "DateTime",
+              "control": "Date picker",
+              "relationship": "—",
+              "required": false,
+              "visible": true,
+              "sampleValue": "hCG",
+              "src": "code"
+            }
+          ]
+        }
+      ]
+    },
+    "Ovulation Induction": {
+      "purpose": "Drug-induced ovulation + timed intercourse (monitoring only, no lab procedure).",
+      "usesPartner": false,
+      "note": "",
+      "steps": [
+        "Consent",
+        "OI Drugs",
+        "Folliculogram",
+        "Trigger",
+        "Timed Intercourse",
+        "Outcome"
+      ],
+      "tabs": {
+        "show": [
+          "Planning",
+          "Folliculogram",
+          "Drugs",
+          "Semen",
+          "Outcome Data",
+          "Checklists"
+        ],
+        "hide": [
+          "Oocyte Retrieval",
+          "Embryo Transfer",
+          "IUI/DI",
+          "Gametes",
+          "Lab Results",
+          "Stored Sample"
+        ]
+      },
+      "sections": [
+        {
+          "name": "Cycle Information",
+          "fields": [
+            {
+              "label": "Treatment Name",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_name",
+              "dataType": "Text",
+              "control": "Textbox",
+              "relationship": "—",
+              "required": true,
+              "visible": true,
+              "sampleValue": "Ovulation Induction — Letrozole",
+              "src": "code"
+            },
+            {
+              "label": "Treatment Type",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_treatmenttype",
+              "dataType": "Choice",
+              "control": "Dropdown",
+              "relationship": "OptionSet: bcrm_treatmenttype",
+              "required": true,
+              "visible": true,
+              "sampleValue": "Ovulation Induction",
+              "src": "code"
+            },
+            {
+              "label": "Cycle Sequence No",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_cyclesequencenumber",
+              "dataType": "AutoNumber",
+              "control": "Read-only",
+              "relationship": "—",
+              "required": false,
+              "visible": true,
+              "sampleValue": "CY-1188",
+              "src": "form"
+            },
+            {
+              "label": "Billing Option",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_treatmentbillingoption",
+              "dataType": "Choice",
+              "control": "Dropdown",
+              "relationship": "OptionSet",
+              "required": true,
+              "visible": true,
+              "sampleValue": "Self-funded",
+              "src": "form"
+            },
+            {
+              "label": "Treatment Template",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_treatmenttemplate",
+              "dataType": "Lookup",
+              "control": "Lookup",
+              "relationship": "N:1 -> bcrm_eventtemplate",
+              "required": false,
+              "visible": true,
+              "sampleValue": "Ovulation Induction",
+              "src": "new"
+            }
+          ]
+        },
+        {
+          "name": "People",
+          "fields": [
+            {
+              "label": "Patient",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_patient",
+              "dataType": "Lookup",
+              "control": "Lookup",
+              "relationship": "N:1 -> contact",
+              "required": true,
+              "visible": true,
+              "sampleValue": "Priya Sample (DEMO) · NHR-0042 · F · DOB 12 Mar 1991",
+              "src": "code"
+            },
+            {
+              "label": "Cycle Doctor",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_cycledoctor",
+              "dataType": "Lookup",
+              "control": "Lookup",
+              "relationship": "N:1 -> systemuser/bcrm_staff",
+              "required": true,
+              "visible": true,
+              "sampleValue": "Dr M. Osei",
+              "src": "form"
+            },
+            {
+              "label": "Cycle Nurse",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_cyclenurse",
+              "dataType": "Lookup",
+              "control": "Lookup",
+              "relationship": "N:1 -> systemuser/bcrm_staff",
+              "required": false,
+              "visible": true,
+              "sampleValue": "R. Nolan",
+              "src": "form"
+            }
+          ]
+        },
+        {
+          "name": "Clinic & Dates",
+          "fields": [
+            {
+              "label": "Managing Clinic",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_managingclinic",
+              "dataType": "Lookup",
+              "control": "Lookup",
+              "relationship": "N:1 -> account/bcrm_clinic",
+              "required": false,
+              "visible": true,
+              "sampleValue": "OX.ar City (DEMO)",
+              "src": "form"
+            },
+            {
+              "label": "Baseline Scan",
+              "entity": "bcrm_fertilitytreatment",
+              "attribute": "bcrm_dateofbaselinescan",
+              "dataType": "DateTime",
+              "control": "Date picker",
+              "relationship": "1:1 stim detail",
+              "required": false,
+              "visible": true,
+              "sampleValue": "14 Jul 2026",
+              "src": "code"
+            },
+            {
+              "label": "Day-10 Scan",
+              "entity": "bcrm_fertilitytreatment",
+              "attribute": "bcrm_day10scandate",
+              "dataType": "DateTime",
+              "control": "Date picker",
+              "relationship": "1:1 stim detail",
+              "required": false,
+              "visible": true,
+              "sampleValue": "24 Jul 2026",
+              "src": "new"
+            }
+          ]
+        },
+        {
+          "name": "Infertility Diagnosis",
+          "fields": [
+            {
+              "label": "Female Diagnosis",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_treatment_details_diagnosis",
+              "dataType": "Choice",
+              "control": "Dropdown",
+              "relationship": "OptionSet / Lookup",
+              "required": false,
+              "visible": true,
+              "sampleValue": "PCOS — anovulation",
+              "src": "code"
+            }
+          ]
+        },
+        {
+          "name": "Plan",
+          "fields": [
+            {
+              "label": "Drug",
+              "entity": "AppointmentDosage",
+              "attribute": "bcrm_drug",
+              "dataType": "Lookup / Text",
+              "control": "Lookup",
+              "relationship": "1:N drug rows",
+              "required": false,
+              "visible": true,
+              "sampleValue": "Letrozole 5 mg (days 3-7)",
+              "src": "code"
+            },
+            {
+              "label": "Monitoring",
+              "entity": "bcrm_fertilitytreatment",
+              "attribute": "bcrm_folliculogram_comments",
+              "dataType": "Multiline Text",
+              "control": "Textarea",
+              "relationship": "—",
+              "required": false,
+              "visible": true,
+              "sampleValue": "Serial follicle scans",
+              "src": "code"
+            },
+            {
+              "label": "Trigger",
+              "entity": "bcrm_fertilitytreatment",
+              "attribute": "bcrm_timeoftrigger",
+              "dataType": "DateTime",
+              "control": "Date picker",
+              "relationship": "—",
+              "required": false,
+              "visible": true,
+              "sampleValue": "hCG when lead follicle ≥ 18 mm",
+              "src": "code"
+            }
+          ]
+        }
+      ]
+    },
+    "Tracking": {
+      "purpose": "Cycle monitoring / scan tracking only (no procedure).",
+      "usesPartner": false,
+      "note": "",
+      "steps": [
+        "Folliculogram Tracking",
+        "LH & Trigger Monitoring",
+        "Outcome / Hand-off"
+      ],
+      "tabs": {
+        "show": [
+          "Planning",
+          "Folliculogram",
+          "Drugs",
+          "Semen",
+          "Outcome Data"
+        ],
+        "hide": [
+          "Oocyte Retrieval",
+          "Embryo Transfer",
+          "IUI/DI",
+          "Gametes",
+          "Lab Results",
+          "Stored Sample",
+          "Checklists"
+        ]
+      },
+      "sections": [
+        {
+          "name": "Cycle Information",
+          "fields": [
+            {
+              "label": "Treatment Name",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_name",
+              "dataType": "Text",
+              "control": "Textbox",
+              "relationship": "—",
+              "required": true,
+              "visible": true,
+              "sampleValue": "Cycle Tracking",
+              "src": "code"
+            },
+            {
+              "label": "Treatment Type",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_treatmenttype",
+              "dataType": "Choice",
+              "control": "Dropdown",
+              "relationship": "OptionSet: bcrm_treatmenttype",
+              "required": true,
+              "visible": true,
+              "sampleValue": "Tracking",
+              "src": "code"
+            },
+            {
+              "label": "Cycle Sequence No",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_cyclesequencenumber",
+              "dataType": "AutoNumber",
+              "control": "Read-only",
+              "relationship": "—",
+              "required": false,
+              "visible": true,
+              "sampleValue": "CY-1189",
+              "src": "form"
+            },
+            {
+              "label": "Treatment Template",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_treatmenttemplate",
+              "dataType": "Lookup",
+              "control": "Lookup",
+              "relationship": "N:1 -> bcrm_eventtemplate",
+              "required": false,
+              "visible": true,
+              "sampleValue": "Cycle Tracking",
+              "src": "new"
+            }
+          ]
+        },
+        {
+          "name": "People",
+          "fields": [
+            {
+              "label": "Patient",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_patient",
+              "dataType": "Lookup",
+              "control": "Lookup",
+              "relationship": "N:1 -> contact",
+              "required": true,
+              "visible": true,
+              "sampleValue": "Priya Sample (DEMO) · NHR-0042 · F · DOB 12 Mar 1991",
+              "src": "code"
+            },
+            {
+              "label": "Cycle Doctor",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_cycledoctor",
+              "dataType": "Lookup",
+              "control": "Lookup",
+              "relationship": "N:1 -> systemuser/bcrm_staff",
+              "required": false,
+              "visible": true,
+              "sampleValue": "Dr M. Osei",
+              "src": "form"
+            },
+            {
+              "label": "Cycle Nurse",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_cyclenurse",
+              "dataType": "Lookup",
+              "control": "Lookup",
+              "relationship": "N:1 -> systemuser/bcrm_staff",
+              "required": false,
+              "visible": true,
+              "sampleValue": "R. Nolan",
+              "src": "form"
+            }
+          ]
+        },
+        {
+          "name": "Clinic & Dates",
+          "fields": [
+            {
+              "label": "Managing Clinic",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_managingclinic",
+              "dataType": "Lookup",
+              "control": "Lookup",
+              "relationship": "N:1 -> account/bcrm_clinic",
+              "required": false,
+              "visible": true,
+              "sampleValue": "OX.ar City (DEMO)",
+              "src": "form"
+            },
+            {
+              "label": "Period Started",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_expecteddateperiodstarted",
+              "dataType": "DateTime",
+              "control": "Date picker",
+              "relationship": "—",
+              "required": false,
+              "visible": true,
+              "sampleValue": "10 Jul 2026",
+              "src": "form"
+            },
+            {
+              "label": "Actual Period Date",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_actualperioddate",
+              "dataType": "DateTime",
+              "control": "Date picker",
+              "relationship": "—",
+              "required": false,
+              "visible": true,
+              "sampleValue": "10 Jul 2026",
+              "src": "form"
+            }
+          ]
+        },
+        {
+          "name": "Plan",
+          "fields": [
+            {
+              "label": "Monitoring",
+              "entity": "bcrm_fertilitytreatment",
+              "attribute": "bcrm_folliculogram_comments",
+              "dataType": "Multiline Text",
+              "control": "Textarea",
+              "relationship": "—",
+              "required": false,
+              "visible": true,
+              "sampleValue": "Serial scans + LH",
+              "src": "code"
+            },
+            {
+              "label": "Hand-off",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_handoffnote",
+              "dataType": "Multiline Text",
+              "control": "Textarea",
+              "relationship": "—",
+              "required": false,
+              "visible": true,
+              "sampleValue": "to IUI / IVF if indicated",
+              "src": "new"
+            }
+          ]
+        }
+      ]
+    },
+    "Thaw and Refreeze": {
+      "purpose": "Retrieve a stored specimen → thaw → (± biopsy) → refreeze → storage.",
+      "usesPartner": true,
+      "note": "",
+      "steps": [
+        "Consent & 3PC",
+        "Select Specimen",
+        "Thaw",
+        "Assess (± Biopsy)",
+        "Refreeze",
+        "Storage",
+        "Witnessing"
+      ],
+      "tabs": {
+        "show": [
+          "Planning",
+          "Semen",
+          "Gametes",
+          "Stored Sample",
+          "Checklists"
+        ],
+        "hide": [
+          "Folliculogram",
+          "Drugs",
+          "Oocyte Retrieval",
+          "Embryo Transfer",
+          "IUI/DI",
+          "Lab Results",
+          "Outcome Data"
+        ]
+      },
+      "sections": [
+        {
+          "name": "Cycle Information",
+          "fields": [
+            {
+              "label": "Treatment Name",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_name",
+              "dataType": "Text",
+              "control": "Textbox",
+              "relationship": "—",
+              "required": true,
+              "visible": true,
+              "sampleValue": "Thaw & Refreeze — PGT",
+              "src": "code"
+            },
+            {
+              "label": "Treatment Type",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_treatmenttype",
+              "dataType": "Choice",
+              "control": "Dropdown",
+              "relationship": "OptionSet: bcrm_treatmenttype",
+              "required": true,
+              "visible": true,
+              "sampleValue": "Thaw and Refreeze",
+              "src": "code"
+            },
+            {
+              "label": "Cycle Sequence No",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_cyclesequencenumber",
+              "dataType": "AutoNumber",
+              "control": "Read-only",
+              "relationship": "—",
+              "required": false,
+              "visible": true,
+              "sampleValue": "CY-1190",
+              "src": "form"
+            },
+            {
+              "label": "Treatment Template",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_treatmenttemplate",
+              "dataType": "Lookup",
+              "control": "Lookup",
+              "relationship": "N:1 -> bcrm_eventtemplate",
+              "required": false,
+              "visible": true,
+              "sampleValue": "Thaw and Refreeze",
+              "src": "new"
+            }
+          ]
+        },
+        {
+          "name": "People",
+          "fields": [
+            {
+              "label": "Patient",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_patient",
+              "dataType": "Lookup",
+              "control": "Lookup",
+              "relationship": "N:1 -> contact",
+              "required": true,
+              "visible": true,
+              "sampleValue": "Priya Sample (DEMO) · NHR-0042 · F · DOB 12 Mar 1991",
+              "src": "code"
+            },
+            {
+              "label": "Partner",
+              "entity": "bcrm_treatment_cycle",
+              "attribute": "bcrm_partner",
+              "dataType": "Lookup",
+              "control": "Lookup",
+              "relationship": "N:1 -> contact",
+              "required": false,
+              "visible": true,
+              "sampleValue": "Alex Sample (DEMO) · NHR-0043 · M · DOB 04 Aug 1988",
+              "src": "code"
+            },
+            {
+              "label": "Embryologist",
+              "entity": "bcrm_thawevent",
+              "attribute": "bcrm_embryologist",
+              "dataType": "Lookup",
+              "control": "Lookup",
+              "relationship": "N:1 -> systemuser/bcrm_staff",
+              "required": true,
+              "visible": true,
+              "sampleValue": "A. Kaur",
+              "src": "new"
+            },
+            {
+              "label": "Witness",
+              "entity": "bcrm_thawevent",
+              "attribute": "bcrm_witness",
+              "dataType": "Lookup",
+              "control": "Lookup",
+              "relationship": "N:1 -> systemuser/bcrm_staff (independent)",
+              "required": true,
+              "visible": true,
+              "sampleValue": "R. Nolan",
+              "src": "new"
+            }
+          ]
+        },
+        {
+          "name": "Specimen & Storage",
+          "fields": [
+            {
+              "label": "Specimen",
+              "entity": "bcrm_egg",
+              "attribute": "bcrm_eggs_id",
+              "dataType": "Lookup",
+              "control": "Lookup",
+              "relationship": "N:1 -> bcrm_egg",
+              "required": false,
+              "visible": true,
+              "sampleValue": "EMB-1043 · Blast 3BB",
+              "src": "new"
+            },
+            {
+              "label": "Reason",
+              "entity": "bcrm_fertilitytreatment",
+              "attribute": "bcrm_treatmentfeatures",
+              "dataType": "Multiline Text",
+              "control": "Textarea",
+              "relationship": "—",
+              "required": false,
+              "visible": true,
+              "sampleValue": "Biopsy for PGT-A",
+              "src": "code"
+            },
+            {
+              "label": "Refreeze Method",
+              "entity": "bcrm_freezeevent",
+              "attribute": "bcrm_freezemethod",
+              "dataType": "Choice",
+              "control": "Dropdown",
+              "relationship": "OptionSet",
+              "required": false,
+              "visible": true,
+              "sampleValue": "Vitrification",
+              "src": "new"
+            },
+            {
+              "label": "Storage Location",
+              "entity": "bcrm_cryolocation",
+              "attribute": "bcrm_cryolocationid",
+              "dataType": "Lookup",
+              "control": "Lookup",
+              "relationship": "N:1 -> bcrm_cryolocation",
+              "required": false,
+              "visible": true,
+              "sampleValue": "TANK-01 · C1 · G2 · S5",
+              "src": "new"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
