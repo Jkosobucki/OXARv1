@@ -270,17 +270,23 @@ tr:last-child td{border-bottom:none}
         <div class="couple" id="couple"></div>
 
         <div class="grid2">
-          <div class="card"><div class="card-b" id="planForm"></div></div>
+          <div class="card">
+            <div class="card-h"><h3 id="tabTitle">Planning</h3><span class="k mono" id="tabEntity"></span></div>
+            <div class="card-b" id="tabContent"></div>
+          </div>
 
           <div class="card panel"><div class="card-b">
-            <h4 id="planTitle">Plan for this cycle</h4>
-            <div class="steps" id="steps"></div>
-            <div style="height:16px"></div>
-            <h4>What this type shows / hides</h4>
-            <div class="hidden-list" id="showhide"></div>
-            <div style="height:16px"></div>
-            <button class="btn primary" data-screen="tpc" style="width:100%;justify-content:center">Continue to Three-Point Check →</button>
-            <div class="proto-note">Prototype · synthetic data · visibility driven by the treatment-type template.</div>
+            <div id="planningContext">
+              <h4 id="planTitle">Plan for this cycle</h4>
+              <div class="steps" id="steps"></div>
+              <div style="height:16px"></div>
+              <h4>What this type shows / hides</h4>
+              <div class="hidden-list" id="showhide"></div>
+              <div style="height:16px"></div>
+              <button class="btn primary" data-screen="tpc" style="width:100%;justify-content:center">Continue to Three-Point Check →</button>
+            </div>
+            <div id="tabContext" style="display:none"></div>
+            <div class="proto-note" id="cfgNote">Prototype · synthetic data · driven by the treatment-type template.</div>
           </div></div>
         </div>
       </section>
@@ -452,10 +458,49 @@ const META={
  "Refreeze Method":["bcrm_freezeevent","bcrm_freezemethod","Choice"],
  "Storage Location":["bcrm_cryolocation","bcrm_cryolocationid","Lookup → bcrm_cryolocation"]
 };
-function bindCaption(label){
-  const m=META[label]; if(!m) return '<div class="bind">(confirm binding)</div>';
+function bindCaption(label,override){
+  const m=override||META[label]; if(!m) return '<div class="bind">(confirm binding)</div>';
   return '<div class="bind">'+m[0]+' · '+m[1]+' · '+m[2]+'</div>';
 }
+
+/* entity each cycle tab binds to */
+const TAB_ENTITY={Planning:"bcrm_treatment_cycle",Folliculogram:"bcrm_fertilitytreatment",Drugs:"AppointmentDosage",
+ "Oocyte Retrieval":"bcrm_opu",Semen:"bcrm_semenprep","Lab Results":"bcrm_eggdetail","Embryo Transfer":"bcrm_embryotransfer",
+ "IUI/DI":"bcrm_insemination",Gametes:"bcrm_egg","Stored Sample":"bcrm_egg / bcrm_cryolocation",
+ "Outcome Data":"bcrm_pregnancy_outcome_details",Checklists:"bcrm_consentchecklist"};
+
+/* Clinical-tab content (synthetic demo rows/fields, config-shaped). fld: [label, attribute, dataType, value] */
+const c=(label,a,dt,value,opt={})=>({label,a,dt,value,req:!!opt.req,mono:!!opt.mono});
+const TABS={
+ "Folliculogram":{desc:"Stimulation monitoring — serial scans, follicle sizes, LH, trigger.",kind:"grid",
+   columns:[{h:"Scan",a:"bcrm_day"},{h:"Date",a:"bcrm_scandate"},{h:"Left ovary (follicles mm)",a:"bcrm_leftovary"},{h:"Right ovary",a:"bcrm_rightovary"},{h:"Endometrium",a:"bcrm_uterus"},{h:"LH",a:"bcrm_lh"}],
+   rows:[["Baseline","14 Jul","AFC 8","AFC 7","4.2 mm","2.1"],["Day 6","20 Jul","10, 9, 8","11, 9","6.8 mm","3.4"],["Day 8","22 Jul","14, 13, 11","15, 12, 10","8.9 mm","5.1"],["Day 10 · trigger","24 Jul","18, 17, 16","19, 17, 15","10.4 mm","—"]]},
+ "Drugs":{desc:"Stimulation drug regimen & doses.",kind:"grid",
+   columns:[{h:"Drug",a:"bcrm_drug"},{h:"Dose",a:"bcrm_dose"},{h:"Route",a:"bcrm_route"},{h:"Frequency",a:"bcrm_frequency"},{h:"Start",a:"bcrm_startdate"},{h:"End",a:"bcrm_enddate"}],
+   rows:[["Gonal-F","225 IU","SC","Daily","16 Jul","24 Jul"],["Cetrotide","0.25 mg","SC","Daily","20 Jul","24 Jul"],["Ovitrelle · trigger","250 mcg","SC","Once","24 Jul","24 Jul"]]},
+ "Oocyte Retrieval":{desc:"Egg collection (OPU) — maturity split feeds ICSI eligibility.",kind:"form",
+   fields:[c("Procedure Date","bcrm_proceduredate","DateTime","28 Jul 2026",{mono:1,req:1}),c("Doctor","bcrm_doctor","Lookup → systemuser","Dr M. Osei",{req:1}),c("Embryologist","bcrm_embryologist","Lookup → systemuser","A. Kaur",{req:1}),c("Witness","bcrm_witness","Lookup → systemuser","R. Nolan",{req:1}),c("Follicles Aspirated","bcrm_folliclesaspirated","Whole Number","14",{mono:1}),c("Eggs Retrieved","bcrm_eggsretrieved","Whole Number","11",{mono:1}),c("MII (mature)","bcrm_mii","Whole Number","8",{mono:1}),c("MI","bcrm_mi","Whole Number","2",{mono:1}),c("GV","bcrm_gv","Whole Number","1",{mono:1}),c("Complications","bcrm_complications","Text","None")]},
+ "Semen":{desc:"Semen preparation — analysis & prepared sample.",kind:"form",
+   fields:[c("Semen Source","bcrm_semensource","Choice","Partner",{req:1}),c("Fresh / Frozen","bcrm_freshfrozen","Choice","Fresh",{req:1}),c("Collection Date","bcrm_collectiondate","DateTime","28 Jul 2026",{mono:1}),c("Volume","bcrm_volume","Decimal","2.8 mL",{mono:1}),c("Count","bcrm_count","Decimal","42 M/mL",{mono:1}),c("Motility","bcrm_motility","Whole Number","58 %",{mono:1}),c("Morphology","bcrm_morphology","Whole Number","6 %",{mono:1}),c("Prepared Motile Count","bcrm_count","Decimal","18 M/mL",{mono:1}),c("Used For","bcrm_usedfor","Choice","ICSI")]},
+ "Lab Results":{desc:"Per-oocyte fertilisation (PN/PB) and embryo development.",kind:"grid",
+   columns:[{h:"Oocyte",a:"bcrm_name"},{h:"Maturity",a:"bcrm_maturity"},{h:"Insem.",a:"bcrm_inseminationtype"},{h:"PN",a:"bcrm_pn"},{h:"PB",a:"bcrm_pb"},{h:"Day 3",a:"bcrm_cellcount"},{h:"Day 5 grade",a:"bcrm_blastocyst"},{h:"Fate",a:"bcrm_embryofate"}],
+   rows:[["OO-1","MII","ICSI","2PN","2PB","8-cell","4AA","Freeze"],["OO-2","MII","ICSI","2PN","2PB","7-cell","3BB","Transfer"],["OO-3","MII","ICSI","1PN","1PB","—","—","Discard"],["OO-4","MI","—","—","—","—","—","Discard"],["OO-5","MII","ICSI","2PN","2PB","8-cell","4BB","Freeze"]]},
+ "Embryo Transfer":{desc:"Transfer procedure (fresh / FET).",kind:"form",
+   fields:[c("Transfer Date","bcrm_transferdate","DateTime","02 Aug 2026",{mono:1,req:1}),c("Embryo","bcrm_embryo","Lookup → bcrm_egg","EMB-1042 · 4AA",{req:1}),c("Transfer Type","bcrm_transfertype","Choice","Fresh",{req:1}),c("Catheter","bcrm_catheter","Text","Wallace soft"),c("Embryologist","bcrm_embryologist","Lookup → systemuser","A. Kaur",{req:1}),c("Doctor","bcrm_doctor","Lookup → systemuser","Dr M. Osei",{req:1}),c("Witness","bcrm_witness","Lookup → systemuser","R. Nolan",{req:1}),c("Outcome","bcrm_outcome","Choice","Pending")]},
+ "IUI/DI":{desc:"Intrauterine insemination.",kind:"form",
+   fields:[c("Method","bcrm_method","Choice","IUI",{req:1}),c("Date","bcrm_date","DateTime","25 Jul 2026",{mono:1,req:1}),c("Prepared Sperm","bcrm_semenprep","Lookup → bcrm_semenprep","SP-0771",{mono:1}),c("Prepared Motile Count","bcrm_count","Decimal","18 M/mL",{mono:1}),c("Catheter","bcrm_catheter","Text","IUI soft"),c("Clinician","bcrm_doctor","Lookup → systemuser","Dr M. Osei",{req:1}),c("Outcome","bcrm_outcome","Choice","Pending")]},
+ "Gametes":{desc:"Specimen master — eggs / sperm / embryos for this cycle.",kind:"grid",
+   columns:[{h:"Specimen",a:"bcrm_eggs_id"},{h:"Type",a:"bcrm_type"},{h:"Status",a:"bcrm_egg_status"},{h:"Freeze date",a:"bcrm_freeze_date"},{h:"Location",a:"bcrm_location"},{h:"Quality",a:"bcrm_stage"}],
+   rows:[["EMB-1042","Embryo","Frozen","02 Jun 2026","TANK-01 · C1·G2·S4","4AA"],["EMB-1043","Embryo","Frozen","02 Jun 2026","TANK-01 · C1·G2·S5","3BB"],["OO-2210","Oocyte","Frozen","18 May 2026","TANK-02 · C3·G1·S9","MII"]]},
+ "Stored Sample":{desc:"Frozen specimens in cryo storage.",kind:"grid",
+   columns:[{h:"Specimen",a:"bcrm_eggs_id"},{h:"Material",a:"bcrm_type"},{h:"Tank",a:"bcrm_nitrogen_tank"},{h:"Position",a:"bcrm_location"},{h:"Freeze date",a:"bcrm_freeze_date"},{h:"Status",a:"bcrm_egg_status"}],
+   rows:[["EMB-1042","Embryo","TANK-01","C1·G2·S4","02 Jun 2026","Stored"],["EMB-1043","Embryo","TANK-01","C1·G2·S5","02 Jun 2026","Stored"],["OO-2210","Oocyte","TANK-02","C3·G1·S9","18 May 2026","Stored"]]},
+ "Outcome Data":{desc:"Pregnancy test & delivery outcome.",kind:"form",
+   fields:[c("Pregnancy Test","bcrm_result_of_pregnancy_test","Choice","Pending"),c("Test Date","bcrm_date_time_of_early_outcome","DateTime","16 Aug 2026",{mono:1}),c("Clinical Pregnancy","bcrm_pregnant","Two Options","—"),c("Delivery Date","bcrm_delivery_date","DateTime","—",{mono:1}),c("Gestation (wks)","bcrm_gestation","Whole Number","—",{mono:1}),c("Gender","bcrm_gender","Choice","—"),c("Weight (g)","bcrm_weight_in_grams","Whole Number","—",{mono:1})]},
+ "Checklists":{desc:"Consent / screening prerequisites gate.",kind:"form",
+   fields:[c("Consent Complete","bcrm_consentcomplete","Two Options","Yes"),c("Screening Complete","bcrm_screeningcomplete","Two Options","Due"),c("Doctor Approval","bcrm_doctorapproval","Two Options","Yes"),c("Ready For Procedure","bcrm_readyforprocedure","Two Options","No"),c("Checked Date","bcrm_checkeddate","DateTime","12 Jul 2026",{mono:1}),c("Checked By","bcrm_checkedby","Lookup → systemuser","R. Nolan")]},
+};
+let currentType="IVF", currentTab="Planning";
 
 const TEMPLATES = {
 "IVF":{purpose:"Full stimulated cycle — collect eggs, fertilise, transfer / freeze.",
@@ -558,49 +603,87 @@ Object.keys(TEMPLATES).forEach((t,i)=>{
 });
 
 function selectType(t){
+  currentType=t;
   document.querySelectorAll('.typebtn').forEach(b=>b.classList.toggle('active',b.dataset.type===t));
   const tpl=TEMPLATES[t];
 
   // test couple banner
-  const couple=document.getElementById('couple');
-  couple.innerHTML =
+  document.getElementById('couple').innerHTML =
     '<div class="person p1"><div class="av">'+PATIENT.init+'</div><div><div class="rol">'+PATIENT.role+'</div><div class="nm">'+PATIENT.name+'</div><div class="meta mono">'+PATIENT.meta+'</div></div></div>'+
     '<div class="person p2'+(tpl.usesPartner?'':' muted')+'"><div class="av">'+PARTNER.init+'</div><div><div class="rol">'+PARTNER.role+(tpl.usesPartner?'':' · not used this cycle')+'</div><div class="nm">'+PARTNER.name+'</div><div class="meta mono">'+PARTNER.meta+'</div></div></div>';
 
-  // dynamic form from the template's sections
-  const form=document.getElementById('planForm'); form.innerHTML='';
-  tpl.sections.forEach(sec=>{
-    const s=document.createElement('div'); s.className='section';
-    let html='<div class="sh">'+sec.name+'</div><div class="fields">';
-    sec.fields.forEach(f=>{
-      html+='<div class="f"><label>'+f.label+(f.req?'<span class="req">*</span>':'')+'</label>'+
-            '<div class="val'+(f.mono?' mono':'')+'">'+f.value+'</div>'+bindCaption(f.label)+'</div>';
-    });
-    html+='</div>'; s.innerHTML=html; form.appendChild(s);
-  });
-
-  // cycle tabs strip
+  // clickable cycle-tab strip (Planning + tabs this type shows)
   const strip=document.getElementById('tabstrip'); strip.innerHTML='';
   ALL_TABS.forEach(tab=>{
-    const hidden=tpl.tabsHide.includes(tab);
-    const e=document.createElement('span'); e.className='tab '+(hidden?'off':'on')+(tab==='Planning'?' current':'');
-    e.textContent=tab; strip.appendChild(e);
+    if(tpl.tabsHide.includes(tab)) return;                 // hidden by the template
+    const e=document.createElement('button'); e.className='tab on'; e.dataset.tab=tab;
+    e.textContent=tab; e.onclick=()=>selectTab(tab); strip.appendChild(e);
   });
 
-  // plan steps
+  // plan steps + shows/hides (Planning context panel)
   const steps=document.getElementById('steps'); steps.innerHTML='';
   tpl.steps.forEach(x=>{const e=document.createElement('span');e.className='step';e.textContent=x;steps.appendChild(e);});
-
-  // shows/hides summary
-  const shownTabs=ALL_TABS.filter(x=>!tpl.tabsHide.includes(x));
+  const shown=ALL_TABS.filter(x=>!tpl.tabsHide.includes(x));
   const fieldCount=tpl.sections.reduce((n,s)=>n+s.fields.length,0);
   document.getElementById('showhide').innerHTML=
     '<b>Purpose:</b> '+tpl.purpose+'<br><br>'+
-    '<b>Shown tabs:</b> '+shownTabs.join(' · ')+'<br><br>'+
+    '<b>Shown tabs:</b> '+shown.join(' · ')+'<br><br>'+
     (tpl.tabsHide.length?'<b>Hidden tabs:</b> '+tpl.tabsHide.join(' · '):'<b>Hidden tabs:</b> none')+
     '<br><br><b>Fields shown:</b> '+fieldCount+' across '+tpl.sections.length+' sections'+
     (tpl.note?'<br><br><b style="color:var(--amber)">⚠ '+tpl.note+'</b>':'');
   document.getElementById('planTitle').textContent='Plan · '+t;
+
+  selectTab('Planning');
+}
+
+function renderPlanningForm(tpl){
+  let out='';
+  tpl.sections.forEach(sec=>{
+    out+='<div class="section"><div class="sh">'+sec.name+'</div><div class="fields">';
+    sec.fields.forEach(f=>{
+      out+='<div class="f"><label>'+f.label+(f.req?'<span class="req">*</span>':'')+'</label>'+
+           '<div class="val'+(f.mono?' mono':'')+'">'+f.value+'</div>'+bindCaption(f.label)+'</div>';
+    });
+    out+='</div></div>';
+  });
+  return out;
+}
+function renderForm(entity,fields){
+  let out='<div class="section"><div class="fields">';
+  fields.forEach(f=>{
+    out+='<div class="f"><label>'+f.label+(f.req?'<span class="req">*</span>':'')+'</label>'+
+         '<div class="val'+(f.mono?' mono':'')+'">'+f.value+'</div>'+bindCaption(f.label,[entity,f.a,f.dt])+'</div>';
+  });
+  return out+'</div></div>';
+}
+function renderGrid(entity,columns,rows){
+  let out='<div class="tbl-wrap"><table><thead><tr>';
+  columns.forEach(c=>out+='<th title="'+c.a+'">'+c.h+'</th>'); out+='</tr></thead><tbody>';
+  rows.forEach(r=>{out+='<tr>';r.forEach((v,i)=>out+='<td'+(i===0?' class="mono"':'')+'>'+v+'</td>');out+='</tr>';});
+  out+='</tbody></table></div>';
+  out+='<div class="bind" style="margin-top:10px">'+entity+' · columns: '+columns.map(c=>c.a).join(' · ')+'</div>';
+  return out;
+}
+function selectTab(tab){
+  currentTab=tab;
+  document.querySelectorAll('.tab').forEach(el=>el.classList.toggle('current',el.dataset.tab===tab));
+  document.getElementById('tabTitle').textContent=tab;
+  document.getElementById('tabEntity').textContent=TAB_ENTITY[tab]||'';
+  const planning=document.getElementById('planningContext'), ctx=document.getElementById('tabContext');
+  if(tab==='Planning'){
+    document.getElementById('tabContent').innerHTML=renderPlanningForm(TEMPLATES[currentType]);
+    planning.style.display=''; ctx.style.display='none';
+  }else{
+    const def=TABS[tab]||{kind:'form',fields:[],desc:''};
+    document.getElementById('tabContent').innerHTML =
+      def.kind==='grid'? renderGrid(TAB_ENTITY[tab],def.columns,def.rows) : renderForm(TAB_ENTITY[tab],def.fields);
+    planning.style.display='none'; ctx.style.display='';
+    ctx.innerHTML='<h4>'+tab+'</h4>'+
+      '<div class="hidden-list"><b>Entity:</b> <span class="mono">'+(TAB_ENTITY[tab]||'')+'</span><br><br>'+def.desc+
+      '<br><br><span style="color:var(--muted-2)">Synthetic demo data · '+(def.kind==='grid'?(def.rows.length+' rows'):(def.fields.length+' fields'))+'</span></div>'+
+      '<div style="height:14px"></div><button class="btn" id="backPlanning" style="width:100%;justify-content:center">← Back to Planning</button>';
+    document.getElementById('backPlanning').onclick=()=>selectTab('Planning');
+  }
 }
 
 /* ---------- Screen switching ---------- */
@@ -729,9 +812,41 @@ document.getElementById('bindToggle').addEventListener('change',e=>{
   document.body.classList.toggle('show-bind', e.target.checked);
 });
 
-/* init */
-selectType('IVF');
-refreshGate();
+/* ---------- config-file driven ----------
+   Uses the embedded TEMPLATES/META by default. When served over http(s) with
+   templates/treatment-type-templates.ui.json present, it loads that file and rebuilds the
+   per-type planning templates + field bindings from it — proving the UI is config-driven.
+   (Browsers block fetch on file:// so opening the raw file uses the embedded copy.) */
+function applyConfig(cfg){
+  if(!cfg || !cfg.templates) return false;
+  const monoTypes=["AutoNumber","DateTime","Whole Number","Decimal"];
+  Object.keys(cfg.templates).forEach(t=>{
+    const c=cfg.templates[t];
+    TEMPLATES[t]={purpose:c.purpose,usesPartner:c.usesPartner,note:c.note||"",
+      steps:c.steps,tabsHide:(c.tabs&&c.tabs.hide)||[],
+      sections:c.sections.map(s=>({name:s.name,fields:s.fields.map(f=>{
+        if(f.entity&&f.attribute) META[f.label]=[f.entity,f.attribute,f.dataType];
+        return {label:f.label,value:f.sampleValue,req:!!f.required,
+                mono:monoTypes.indexOf(f.dataType)>=0 || /Sequence|EMB-|OO-|SP-/.test(f.sampleValue||"")};
+      })}))};
+  });
+  return true;
+}
+async function boot(){
+  const note=document.getElementById('cfgNote');
+  try{
+    const r=await fetch('../templates/treatment-type-templates.ui.json',{cache:'no-store'});
+    const r2 = r.ok ? r : await fetch('treatment-type-templates.ui.json',{cache:'no-store'});
+    if(r2.ok && applyConfig(await r2.json())){
+      note.innerHTML='Config: <b>loaded from treatment-type-templates.ui.json</b> · synthetic data.';
+    } else throw 0;
+  }catch(e){
+    note.textContent='Config: embedded (serve over http to load treatment-type-templates.ui.json) · synthetic data.';
+  }
+  selectType('IVF');
+  refreshGate();
+}
+boot();
 </script>
 </body>
 </html>
